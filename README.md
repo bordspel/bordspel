@@ -1,3 +1,3 @@
 # bordspel
 
-Digital expansion of our game.
+Digital expansion of our board game.
