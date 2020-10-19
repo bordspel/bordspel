@@ -2,7 +2,7 @@ from element import *
 from layer import layerManager
 
 """
-Allows you to add a functioning input field to a Layer.
+Allows you to add a functioning button to a Layer.
 """
 class Button(Element):
     
