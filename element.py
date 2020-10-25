@@ -91,9 +91,10 @@ class Element:
             
             function(self, layer, event)
             
-    def callKey(self, layer):
+    def callKey(self, layer, type):
         for function in self.keyFunctions:
             event = Empty()
+            event.type = type
             event.key = key
             event.keyCode = keyCode
             

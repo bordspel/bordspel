@@ -69,12 +69,15 @@ class Input(Element):
                 self.focused = False
                         
     def key(self, element, layer, event):
-        if self.focused:            
-            if event.key == BACKSPACE:
-                self.text = self.text[:-1]
-                return
+        if self.focused:        
+            if event.type == "typed":
+                # print(layerManager.controlPressed)
+                
+                if event.key == BACKSPACE:
+                    self.text = self.text[:-1]
+                    return
             
-            if event.key == TAB:
-                return
+                if event.key == TAB or event.key == ENTER or event.key == CONTROL:
+                    return
             
-            self.text += event.key if len(self.text) < self.maxLength else ""
+                self.text += event.key if len(self.text) < self.maxLength else ""
