@@ -54,6 +54,24 @@ class LayerManager:
     # Check if a Layer is active.
     def hasActiveLayer(self):
         return self.activeLayer != None
+    
+    """
+    Do not call these functions manually, it might break the whole system.
+    """
+    def draw(self):
+        if self.hasActiveLayer():
+            for element in self.getActiveLayer().elements:
+                element.callDraw(self.getActiveLayer())
+        
+    def mouse(self, type):
+        if self.hasActiveLayer():
+            for element in self.getActiveLayer().elements:
+                element.callMouse(self.getActiveLayer(), type)
+            
+    def key(self, type):
+        if self.hasActiveLayer():
+            for element in self.getActiveLayer().elements:
+                element.callKey(self.getActiveLayer(), type)
 
 # Define the LayerManager.
 layerManager = LayerManager()
@@ -80,23 +98,9 @@ class Layer:
     
         return self
     
+    # Returns the Element by the id.
     def getElementByID(self, id):
         return [x for x in self.elements if x.id == id]
-    
-    """
-    Do not call these functions manually, it might break the whole system.
-    """
-    def draw(self):
-        for element in self.elements:
-            element.callDraw(self)
-        
-    def mouse(self, type):
-        for element in self.elements:
-            element.callMouse(self, type)
-            
-    def key(self):
-        for element in self.elements:
-            element.callKey(self)
 
 
 """
@@ -119,19 +123,27 @@ def draw():
     if len(layerManager.getActiveLayer().customCursors) == 0:
         cursor(ARROW)
     
-    layerManager.getActiveLayer().draw()
+    layerManager.draw()
     
 def mouseClicked():
-    layerManager.getActiveLayer().mouse("click")
+    layerManager.mouse("click")
     
 def mouseMoved():
-    layerManager.getActiveLayer().mouse("move")
+    layerManager.mouse("move")
         
 def mousePressed():
-    layerManager.getActiveLayer().mouse("pressed")
+    layerManager.mouse("pressed")
        
 def mouseReleased():
-    layerManager.getActiveLayer().mouse("released")
+    layerManager.mouse("released")
     
-def keyTyped(event):
-    layerManager.getActiveLayer().key()
+def keyTyped():
+    layerManager.key("typed")
+    
+# This doesn't work for some reason.
+# https://py.processing.org/reference/keyPressed.html
+def keyPressed():
+    layerManager.key("pressed")
+    
+def keyReleased():
+    layerManager.key("released")
