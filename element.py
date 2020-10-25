@@ -54,21 +54,6 @@ class Element:
         return self
     
     """
-    Variable helper functions. 
-    Note: These might be removed in the future because they are not as usefull anymore.
-    """
-    def defineVariable(self, name, value):
-        if not hasattr(self, name):
-            setattr(self, name, value)
-            
-        return self
-    
-    def setVariable(self, name, value):
-        setattr(self, name, value)
-        
-        return self
-    
-    """
     Functions that get information or manipulates the Element.
     """
     def getID(self):
