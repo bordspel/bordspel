@@ -8,7 +8,6 @@ from client import *
 
 client = Client()
 client.connect()
-client.send("test")
 
 def listen(client, message):
     print(message)
