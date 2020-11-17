@@ -1,2 +1,6 @@
 # Compiled class file
 *.class
+# .jar file
+*.jar
+# Visual studio code file
+*.vscode
