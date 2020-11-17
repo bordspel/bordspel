@@ -124,7 +124,7 @@ def draw():
         cursor(ARROW)
     
     layerManager.draw()
-    
+
 def mouseClicked():
     layerManager.mouse("click")
     

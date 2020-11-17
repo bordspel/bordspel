@@ -7,7 +7,7 @@ Allows you to add a functioning input field to a Layer.
 class Input(Element):
     
     def __init__(self, id, x=0, y=0, w=0, h=0, placeholder="", maxLength=14, textColor="#000000", textSize=16):
-        Element.__init__(self, id)
+        Element.__init__(self, id, x, y)
         self.drawFunction(self.draw)
         self.mouseFunction(self.mouse)
         self.keyFunction(self.key)
@@ -18,8 +18,6 @@ class Input(Element):
         
         self.width = w
         self.height = h
-        self.x = x
-        self.y = y
         self.textColor = textColor
         self.textSize = textSize
         self.placeholder = placeholder

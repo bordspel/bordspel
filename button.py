@@ -7,14 +7,12 @@ Allows you to add a functioning button to a Layer.
 class Button(Element):
     
     def __init__(self, id, x=0, y=0, w=0, h=0, baseColor="#4CAF50", highlightColor="#3e8e41"):
-        Element.__init__(self, id)
+        Element.__init__(self, id, x, y)
         self.drawFunction(self.draw)
         self.mouseFunction(self.mouse)
         
         self.width = w
         self.height = h
-        self.x = x
-        self.y = y
         self.baseColor = baseColor
         self.highlightColor = highlightColor
         

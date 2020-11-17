@@ -9,13 +9,16 @@ The Element class is an abstract Element. Inherit this Class to be able to add t
 """
 class Element:
     
-    def __init__(self, id):
+    def __init__(self, id, x, y):
         self.mouseFunctions = []
         self.drawFunctions = []
         self.keyFunctions = []
         
         self.id = id
         self.hidden = False
+        
+        self.x = x
+        self.y = y
         
     """
     Register the Listener functions.
