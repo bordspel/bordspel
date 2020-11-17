@@ -1,4 +1,4 @@
-from element import *
+from element import Element
 from layer import layerManager
 
 """

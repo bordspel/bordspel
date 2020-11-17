@@ -4,6 +4,7 @@ from button import *
 from text import *
 from input import *
 from settings import *
+import client
 
 # Setup function.
 def setup():

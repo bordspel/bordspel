@@ -1,4 +1,4 @@
-from element import *
+from element import Element
 
 """
 Allows you to display text to a Layer.
