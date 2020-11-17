@@ -4,3 +4,5 @@
 *.jar
 # Visual studio code file
 *.vscode
+# Properties file
+*.properties
