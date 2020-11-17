@@ -4,7 +4,16 @@ from button import *
 from text import *
 from input import *
 from settings import *
-import client
+from client import *
+
+client = Client()
+client.connect()
+client.send("test")
+
+def listen(client, message):
+    print(message)
+
+client.register_listener(listen)
 
 # Setup function.
 def setup():
@@ -32,3 +41,7 @@ def setup():
     # Select the current active Layer.
     background(255)
     layerManager.setActiveLayer("menu")
+
+
+def stop():
+    client.close()
