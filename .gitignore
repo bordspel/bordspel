@@ -6,3 +6,5 @@
 *.vscode
 # Properties file
 *.properties
+
+__pycache__
