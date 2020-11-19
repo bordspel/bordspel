@@ -1,10 +1,12 @@
-from layer import *
-from element import *
-from button import *
-from text import *
-from input import *
 from settings import *
-import client
+
+from elements.layer import *
+from elements.element import *
+from elements.button import *
+from elements.input import *
+from elements.text import *
+
+import networking.client
 
 # Setup function.
 def setup():
