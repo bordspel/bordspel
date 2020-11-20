@@ -6,6 +6,8 @@ from elements.button import *
 from elements.input import *
 from elements.text import *
 
+from manager.gameManager import gameManager
+
 import networking.client
 
 # Setup function.
@@ -14,7 +16,13 @@ def setup():
     # Note: Fullscreen requires scaling which is not implemented.
     # displayWidth and displayHeight need to be used.
     # fullScreen()
-    
+
+    # Define the GameManager.
+    global gameManager
+    # gameManager.imageManager.loadImage("sketch.png")
+    # gameManager.audioManager.loadAudio("audio.mp3")
+    # gameManager.audioManager.getAudio("audio.mp3").play()
+
     # Create the Layers with their respective elements.
     menu = Layer("menu")
     menu.addElement(Text("#text2", x=10, y=45, text="Name").horizontal(LEFT).textcolor("#757575").textsize(16))
