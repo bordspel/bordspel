@@ -8,7 +8,7 @@ from elements.text import *
 
 from manager.gameManager import gameManager
 
-import networking.client
+# from networking.client import *
 
 # Setup function.
 def setup():
@@ -42,3 +42,7 @@ def setup():
     # Select the current active Layer.
     background(255)
     layerManager.setActiveLayer("menu")
+
+
+def stop():
+    gameManager.client.close()
