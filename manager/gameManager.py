@@ -10,5 +10,6 @@ class GameManager:
         self.audioManager = AudioManager()
 
         self.client = Client()
+        # self.client.connect()
 
 gameManager = GameManager()

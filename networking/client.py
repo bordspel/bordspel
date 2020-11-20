@@ -20,10 +20,13 @@ class Client:
             self.listeners.append(_callback)
 
     def connect(self):
-        self.sock.connect((socketIP, socketPort))
-        
-        self.listenerThread = threading.Thread(target=self.listen)
-        self.listenerThread.start()
+        try:
+            self.sock.connect((socketIP, socketPort))
+            
+            self.listenerThread = threading.Thread(target=self.listen)
+            self.listenerThread.start()
+        except:
+            print("Connection failed while trying to connect to the server.")
 
         self.send("handshake", {})
 
@@ -31,11 +34,15 @@ class Client:
         data["type"] = type
         data["id"] = self.id
         data["room"] = self.room
-        self.sock.send(json.dumps(data))
+
+        try:
+            self.sock.send(json.dumps(data))
+        except:
+            pass
 
     def listen(self):
         self.running = True
-        self.sock.settimeout(5)
+        self.sock.settimeout(3)
 
         while self.running:
             try:
