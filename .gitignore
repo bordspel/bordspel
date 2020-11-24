@@ -1,7 +1,7 @@
 # Compiled class file
 *.class
 # .jar file
-*.jar
+processing-py.jar
 # Visual studio code file
 *.vscode
 # Properties file
