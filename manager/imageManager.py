@@ -34,7 +34,7 @@ class ImageManager:
         if not os.path.isfile(path):
             return False
 
-        image = loadImage(path)
+        image = requestImage(path)
         self.images[path] = image
 
         return True

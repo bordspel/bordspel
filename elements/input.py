@@ -1,5 +1,5 @@
-from element import Element
-from layer import layerManager
+from elements.element import Element
+from elements.layer import layerManager
 
 """
 Allows you to add a functioning input field to a Layer.

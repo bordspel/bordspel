@@ -1,4 +1,4 @@
-from element import Element
+from elements.element import Element
 
 """
 Allows you to display text to a Layer.
