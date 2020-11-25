@@ -6,7 +6,7 @@ Allows you to add a functioning input field to a Layer.
 """
 class Input(Element):
     
-    def __init__(self, id, x=0, y=0, w=0, h=0, placeholder="", maxLength=14, textColor="#000000", textSize=16):
+    def __init__(self, id, x=0, y=0, w=0, h=0, placeholder="", textColor="#000000", textSize=16):
         Element.__init__(self, id, x, y)
         self.drawFunction(self.draw)
         self.mouseFunction(self.mouse)
@@ -18,10 +18,15 @@ class Input(Element):
         
         self.width = w
         self.height = h
+        self.x = x
+        self.y = y
+        self.padding = 5
         self.textColor = textColor
         self.textSize = textSize
         self.placeholder = placeholder
-        self.maxLength = maxLength
+        self.caretPos = 0
+        self.caretVisible = False
+        self.viewOffset = 0
         
     def draw(self, element, layer):
         # Create the rectangle.
@@ -40,15 +45,35 @@ class Input(Element):
         if self.focused:
             self.counter += 1
 
-            if len(self.text) < self.maxLength:
-                if self.counter >= frameRate * 0.9:
-                    character = "|"
-                    self.counter = 0 if self.counter >= 2 * frameRate * 0.9 else self.counter
-                        
+            if self.counter >= frameRate * 0.6:
+                self.caretVisible = True
+                self.counter = 0 if self.counter >= 2 * frameRate * 0.6 else self.counter
+            else:
+                self.caretVisible = False
         
         # Actually create the text.
-        s = self.text + character if len(self.text) > 0 else self.placeholder + character
-        text(s, self.x + 5, self.y + (self.height / 2))
+        start = 0
+        while textWidth(self.text[start:]) > self.width - 2 * self.padding:
+            start += 1
+        self.viewOffset = start
+        if self.caretPos < self.viewOffset:
+            self.viewOffset = self.caretPos
+            stop = len(self.text) - (self.viewOffset - self.caretPos)
+        else:
+            stop = len(self.text)
+        s = self.text[self.viewOffset:stop] if len(
+            self.text) > 0 else self.placeholder
+        text(s, self.x + self.padding, self.y + (self.height / 2))
+        
+        # Draw caret
+        if self.caretVisible:
+            # if textWidth(self.text[:self.caretPos]) < self.width - 2 * self.padding:
+            caretX = textWidth(self.text[self.viewOffset:self.caretPos])
+            # else:
+            # caretX = self.width - 2 * self.padding
+            stroke("#000000")
+            line(self.x + self.padding + caretX, self.y + self.padding, self.x +
+                 self.padding + caretX, self.y - 2 * self.padding + self.height)
         
         # Update the pointer.
         if (mouseX >= self.x and mouseX <= element.width + self.x) and (mouseY >= self.y and mouseY <= element.height + self.y):
@@ -62,20 +87,27 @@ class Input(Element):
         if event.type == "click" and event.button == LEFT:
             if (event.x >= self.x and event.x <= element.width + self.x) and (event.y >= self.y and event.y <= element.height + self.y):
                 self.focused = True
-                self.counter = frameRate * 0.9
+                self.counter = frameRate * 0.6
             else:
                 self.focused = False
+                self.caretVisible = False
                         
     def key(self, element, layer, event):
-        if self.focused:        
+        if self.focused:
             if event.type == "typed":
                 # print(layerManager.controlPressed)
                 
                 if event.key == BACKSPACE:
-                    self.text = self.text[:-1]
+                    self.text = self.text[:self.caretPos -
+                                          1] + self.text[self.caretPos:]
+                    self.caretPos -= 1
+                    self.counter = frameRate * 0.6
                     return
             
                 if event.key == TAB or event.key == ENTER or event.key == CONTROL:
                     return
             
-                self.text += event.key if len(self.text) < self.maxLength else ""
+                self.text = self.text[:self.caretPos] + \
+                    event.key + self.text[self.caretPos:]
+                self.caretPos += 1
+                self.counter = frameRate * 0.6
