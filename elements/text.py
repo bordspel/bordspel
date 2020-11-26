@@ -36,7 +36,7 @@ class Text(Element):
         self.textSize = size
         return self
         
-    def draw(self, element, layer):
+    def draw(self, event):
         textSize(self.textSize)
         textAlign(self.horizontalAlignment, self.verticalAlignment)
         

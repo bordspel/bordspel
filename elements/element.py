@@ -1,8 +1,19 @@
 """
-Helper Class to create empty objects.
+Helper Class to create Event objects. 
+These event objects are used in every listener and always include the Element and Layer.
+Custom variables may also be passed.
 """
-class Empty:
-    pass
+class Event:
+
+    def __init__(self, element, layer):
+        self.element = element
+        self.layer = layer
+
+    def getElement(self):
+        return self.element
+
+    def getLayer(self):
+        return self.layer
 
 """
 The Element class is an abstract Element. Inherit this Class to be able to add this to a Layer.
@@ -10,9 +21,9 @@ The Element class is an abstract Element. Inherit this Class to be able to add t
 class Element:
     
     def __init__(self, id, x, y):
-        self.mouseFunctions = []
-        self.drawFunctions = []
-        self.keyFunctions = []
+        self._mouseHandlers = []
+        self._drawHandlers = []
+        self._keyHandlers = []
         
         self.id = id
         self.hidden = False
@@ -25,34 +36,34 @@ class Element:
     """
     def registerMouseListener(self, _callback = None):
         if _callback:
-            self.mouseFunctions.append(_callback)  
+            self._mouseHandlers.append(_callback)  
 
         return self
     
     def unregisterMouseListener(self, _callback):
-        self.mouseFunctions.remove(_callback)
+        self._mouseHandlers.remove(_callback)
         
         return self
             
     def registerDrawListener(self, _callback = None):
         if _callback:
-            self.drawFunctions.append(_callback)
+            self._drawHandlers.append(_callback)
             
         return self
     
     def unregisterDrawListener(self, _callback):
-        self.drawFunctions.remove(_callback)
+        self._drawHandlers.remove(_callback)
         
         return self
     
     def registerKeyListener(self, _callback = None):
         if _callback:
-            self.keyFunctions.append(_callback)
+            self._keyHandlers.append(_callback)
             
         return self
     
     def unregisterKeyListener(self, _callback):
-        self.keyFunctions.remove(_callback)
+        self._keyHandlers.remove(_callback)
         
         return self
     
@@ -81,23 +92,24 @@ class Element:
     def __callDraw__(self, layer):
         self.layer = layer
         if not self.hidden:
-            [function(self, layer) for function in self.drawFunctions]
+            event = Event(self, layer)
+            [function(event) for function in self._drawHandlers]
             
     def __callMouse__(self, layer, type):
-        for function in self.mouseFunctions:
-            event = Empty()
+        for function in self._mouseHandlers:
+            event = Event(self, layer)
             event.type = type
             event.x = mouseX
             event.y = mouseY
             event.button = mouseButton
             
-            function(self, layer, event)
+            function(event)
             
     def __callKey__(self, layer, type):
-        for function in self.keyFunctions:
-            event = Empty()
+        for function in self._keyHandlers:
+            event = Event(self, layer)
             event.type = type
             event.key = key
             event.keyCode = keyCode
             
-            function(self, layer, event)
+            function(event)

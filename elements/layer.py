@@ -8,6 +8,8 @@ class LayerManager:
     def __init__(self):
         self.layers = []
         self.activeLayer = None
+
+        self.customCursors = set()
         
     # Add a Layer.
     def addLayer(self, layer):
@@ -67,8 +69,6 @@ class LayerManager:
             for element in self.getActiveLayer().elements:
                 element.__callKey__(self.getActiveLayer(), type)
 
-# Define the LayerManager.
-layerManager = LayerManager()
 
 """
 This class represents a Layer. You can add and remove elements from this.
@@ -78,7 +78,6 @@ class Layer:
     def __init__(self, name):
         self.name = name
         self.elements = []
-        self.customCursors = set()
         
     # Add an element to the Layer.
     def addElement(self, element):
@@ -95,49 +94,3 @@ class Layer:
     # Returns the Element by the id.
     def getElementByID(self, id):
         return [element for element in self.elements if element.id == id]
-
-
-"""
-Do not use these functions. Use the Element and Layer system.
-These functions listen for the various events in the window and fire the correct event handlers.
-"""
-def draw():
-    global layerManager
-    background(255)
-    
-    # Used for debug.
-    if DEBUG:
-        textSize(12)
-        textAlign(RIGHT, BOTTOM)
-        fill(0)
-        s = "Layer: " + str(layerManager.getActiveLayerName())
-        text(s, screenWidth, screenHeight)
-        
-    # Used to reset the cursor.
-    if len(layerManager.getActiveLayer().customCursors) == 0:
-        cursor(ARROW)
-    
-    layerManager.__callDraw__()
-
-def mouseClicked():
-    layerManager.__callMouse__("click")
-    
-def mouseMoved():
-    layerManager.__callMouse__("move")
-        
-def mousePressed():
-    layerManager.__callMouse__("pressed")
-       
-def mouseReleased():
-    layerManager.__callMouse__("released")
-    
-def keyTyped():
-    layerManager.__callKey__("typed")
-    
-# This doesn't work for some reason.
-# https://py.processing.org/reference/keyPressed.html
-def keyPressed():
-    layerManager.__callKey__("pressed")
-    
-def keyReleased():
-    layerManager.__callKey__("released")
