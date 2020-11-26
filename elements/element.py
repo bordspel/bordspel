@@ -23,35 +23,35 @@ class Element:
     """
     Register the Listener functions.
     """
-    def mouseFunction(self, _callback = None):
+    def registerMouseListener(self, _callback = None):
         if _callback:
             self.mouseFunctions.append(_callback)  
 
         return self
     
-    def removeMouseFunction(self, _callback):
+    def unregisterMouseListener(self, _callback):
         self.mouseFunctions.remove(_callback)
         
         return self
             
-    def drawFunction(self, _callback = None):
+    def registerDrawListener(self, _callback = None):
         if _callback:
             self.drawFunctions.append(_callback)
             
         return self
     
-    def removeDrawFunction(self, _callback):
+    def unregisterDrawListener(self, _callback):
         self.drawFunctions.remove(_callback)
         
         return self
     
-    def keyFunction(self, _callback = None):
+    def registerKeyListener(self, _callback = None):
         if _callback:
             self.keyFunctions.append(_callback)
             
         return self
     
-    def removeKeyFunction(self, _callback):
+    def unregisterKeyListener(self, _callback):
         self.keyFunctions.remove(_callback)
         
         return self
@@ -78,13 +78,12 @@ class Element:
     """
     Do not call these functions manually, it might break the whole system.
     """
-    def callDraw(self, layer):
+    def __callDraw__(self, layer):
         self.layer = layer
         if not self.hidden:
-            for function in self.drawFunctions:
-                function(self, layer)
+            [function(self, layer) for function in self.drawFunctions]
             
-    def callMouse(self, layer, type):
+    def __callMouse__(self, layer, type):
         for function in self.mouseFunctions:
             event = Empty()
             event.type = type
@@ -94,7 +93,7 @@ class Element:
             
             function(self, layer, event)
             
-    def callKey(self, layer, type):
+    def __callKey__(self, layer, type):
         for function in self.keyFunctions:
             event = Empty()
             event.type = type

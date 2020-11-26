@@ -8,9 +8,9 @@ class Input(Element):
     
     def __init__(self, id, x=0, y=0, w=0, h=0, placeholder="", textColor="#000000", textSize=16):
         Element.__init__(self, id, x, y)
-        self.drawFunction(self.draw)
-        self.mouseFunction(self.mouse)
-        self.keyFunction(self.key)
+        self.registerDrawListener(self.draw)
+        self.registerMouseListener(self.mouse)
+        self.registerKeyListener(self.key)
         
         self.focused = False
         self.text = ""

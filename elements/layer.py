@@ -19,27 +19,21 @@ class LayerManager:
         
     # Remove a Layer by name.
     def removeLayerByName(self, name):
-        for layer in self.layers:
-            if layer.name == name:
-                self.layers.remove(layer)
-                
-                # TODO: Clear the screen.
-                
-                return True
-            
-        return False
+        def remove(layer):
+            self.layers.remove(layer)
+
+            return layer
+        
+        return len([remove(layer) for layer in self.layers if layer.name == name]) != 0
         
     # Set the active Layer by name.
     def setActiveLayer(self, name):
-        for layer in self.layers:
-            if layer.name == name:                
-                self.activeLayer = layer
-                
-                # TODO: Clear the screen.
-                
-                return True
-            
-        return False
+        def setActive(layer):
+            self.activeLayer = layer
+
+            return layer
+
+        return len([setActive(layer) for layer in self.layers if layer.name == name]) != 0
         
     # Get the current active Layer.
     def getActiveLayer(self):
@@ -58,20 +52,20 @@ class LayerManager:
     """
     Do not call these functions manually, it might break the whole system.
     """
-    def draw(self):
+    def __callDraw__(self):
         if self.hasActiveLayer():
             for element in self.getActiveLayer().elements:
-                element.callDraw(self.getActiveLayer())
+                element.__callDraw__(self.getActiveLayer())
         
-    def mouse(self, type):
+    def __callMouse__(self, type):
         if self.hasActiveLayer():
             for element in self.getActiveLayer().elements:
-                element.callMouse(self.getActiveLayer(), type)
+                element.__callMouse__(self.getActiveLayer(), type)
             
-    def key(self, type):
+    def __callKey__(self, type):
         if self.hasActiveLayer():
             for element in self.getActiveLayer().elements:
-                element.callKey(self.getActiveLayer(), type)
+                element.__callKey__(self.getActiveLayer(), type)
 
 # Define the LayerManager.
 layerManager = LayerManager()
@@ -100,7 +94,7 @@ class Layer:
     
     # Returns the Element by the id.
     def getElementByID(self, id):
-        return [x for x in self.elements if x.id == id]
+        return [element for element in self.elements if element.id == id]
 
 
 """
@@ -123,27 +117,27 @@ def draw():
     if len(layerManager.getActiveLayer().customCursors) == 0:
         cursor(ARROW)
     
-    layerManager.draw()
+    layerManager.__callDraw__()
 
 def mouseClicked():
-    layerManager.mouse("click")
+    layerManager.__callMouse__("click")
     
 def mouseMoved():
-    layerManager.mouse("move")
+    layerManager.__callMouse__("move")
         
 def mousePressed():
-    layerManager.mouse("pressed")
+    layerManager.__callMouse__("pressed")
        
 def mouseReleased():
-    layerManager.mouse("released")
+    layerManager.__callMouse__("released")
     
 def keyTyped():
-    layerManager.key("typed")
+    layerManager.__callKey__("typed")
     
 # This doesn't work for some reason.
 # https://py.processing.org/reference/keyPressed.html
 def keyPressed():
-    layerManager.key("pressed")
+    layerManager.__callKey__("pressed")
     
 def keyReleased():
-    layerManager.key("released")
+    layerManager.__callKey__("released")
