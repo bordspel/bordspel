@@ -8,7 +8,7 @@ class Text(Element):
     #TODO: Implement fonts.
     def __init__(self, id, x=0, y=0, text="", textSize=18, color="#000000", horizontalAlignment=CENTER, verticalAlignment=CENTER):
         Element.__init__(self, id, x, y)
-        self.drawFunction(self.draw)
+        self.registerDrawListener(self.draw)
         
         self.text = text
         self.textSize = textSize
@@ -36,7 +36,7 @@ class Text(Element):
         self.textSize = size
         return self
         
-    def draw(self, element, layer):
+    def draw(self, event):
         textSize(self.textSize)
         textAlign(self.horizontalAlignment, self.verticalAlignment)
         

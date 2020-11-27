@@ -1,5 +1,6 @@
+from manager.gameManager import gameManager
+
 from elements.element import Element
-from elements.layer import layerManager
 
 """
 Allows you to add a functioning input field to a Layer.
@@ -8,9 +9,9 @@ class Input(Element):
     
     def __init__(self, id, x=0, y=0, w=0, h=0, placeholder="", textColor="#000000", textSize=16):
         Element.__init__(self, id, x, y)
-        self.drawFunction(self.draw)
-        self.mouseFunction(self.mouse)
-        self.keyFunction(self.key)
+        self.registerDrawListener(self.draw)
+        self.registerMouseListener(self.mouse)
+        self.registerKeyListener(self.key)
         
         self.focused = False
         self.text = ""
@@ -26,7 +27,10 @@ class Input(Element):
         self.placeholder = placeholder
         self.caretVisible = False
         
-    def draw(self, element, layer):
+    def draw(self, event):
+        element = event.element
+        layer = event.layer
+
         # Create the rectangle.
         stroke("#000000") if self.focused else stroke("#CCCCCC")
             
@@ -67,24 +71,24 @@ class Input(Element):
         # Update the pointer.
         if (mouseX >= self.x and mouseX <= element.width + self.x) and (mouseY >= self.y and mouseY <= element.height + self.y):
             cursor(TEXT)
-            layer.customCursors.add(self)
+            gameManager.layerManager.customCursors.add(self)
         else:
-            layer.customCursors.discard(self)
+            gameManager.layerManager.customCursors.discard(self)
         
-    def mouse(self, element, layer, event):
+    def mouse(self, event):
         # To check if the element is in focus. 
         if event.type == "click" and event.button == LEFT:
-            if (event.x >= self.x and event.x <= element.width + self.x) and (event.y >= self.y and event.y <= element.height + self.y):
+            if (event.x >= self.x and event.x <= event.element.width + self.x) and (event.y >= self.y and event.y <= event.element.height + self.y):
                 self.focused = True
                 self.counter = frameRate * 0.6
             else:
                 self.focused = False
                 self.caretVisible = False
                         
-    def key(self, element, layer, event):
+    def key(self, event):
         if self.focused:
             if event.type == "typed":
-                # print(layerManager.controlPressed)
+                # print(gameManager.layerManager.controlPressed)
                 
                 if event.key == BACKSPACE:
                     if len(self.text) > 0:

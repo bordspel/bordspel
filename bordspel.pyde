@@ -1,10 +1,10 @@
 from settings import *
 
-from elements.layer import *
-from elements.element import *
-from elements.button import *
-from elements.input import *
-from elements.text import *
+from elements.listeners import *
+from elements.layer import Layer
+from elements.button import Button
+from elements.input import Input
+from elements.text import Text
 
 from manager.gameManager import gameManager
 
@@ -34,12 +34,12 @@ def setup():
     game.addElement(Text("#text1", x=300, y=60, text="Go to layer1", textSize=16, color="#FFFFFFF"))
         
     # Add the Layers to the LayerManager.
-    layerManager.addLayer(menu)
-    layerManager.addLayer(game)
+    gameManager.layerManager.addLayer(menu)
+    gameManager.layerManager.addLayer(game)
         
     # Select the current active Layer.
     background(255)
-    layerManager.setActiveLayer("menu")
+    gameManager.layerManager.setActiveLayer("menu")
 
 
 def stop():
