@@ -1,10 +1,11 @@
 from settings import *
 
-from elements.listeners import *
-from elements.layer import Layer
-from elements.button import Button
-from elements.input import Input
-from elements.text import Text
+from element.listeners import *
+from element.layer import Layer
+from element.elements.button import Button
+from element.elements.input import Input
+from element.elements.text import Text
+from element.elements.image import Image
 
 from manager.gameManager import gameManager
 
