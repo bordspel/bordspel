@@ -25,9 +25,7 @@ class Input(Element):
         self.textColor = textColor
         self.textSize = textSize
         self.placeholder = placeholder
-        self.caretPos = 0
         self.caretVisible = False
-        self.viewOffset = 0
         
     def draw(self, event):
         element = event.element
@@ -42,7 +40,7 @@ class Input(Element):
         # Create the text inside of the input.
         textSize(self.textSize)
         textAlign(LEFT, CENTER)
-        fill(self.textColor)
+        fill(self.textColor if len(self.text) > 0 else "#AAAAAA")
         
         # Update the counter, this is used to display the | at the end.
         character = ""
@@ -59,22 +57,13 @@ class Input(Element):
         start = 0
         while textWidth(self.text[start:]) > self.width - 2 * self.padding:
             start += 1
-        self.viewOffset = start
-        if self.caretPos < self.viewOffset:
-            self.viewOffset = self.caretPos
-            stop = len(self.text) - (self.viewOffset - self.caretPos)
-        else:
-            stop = len(self.text)
-        s = self.text[self.viewOffset:stop] if len(
+        s = self.text[start:] if len(
             self.text) > 0 else self.placeholder
         text(s, self.x + self.padding, self.y + (self.height / 2))
         
         # Draw caret
         if self.caretVisible:
-            # if textWidth(self.text[:self.caretPos]) < self.width - 2 * self.padding:
-            caretX = textWidth(self.text[self.viewOffset:self.caretPos])
-            # else:
-            # caretX = self.width - 2 * self.padding
+            caretX = textWidth(self.text[start:])
             stroke("#000000")
             line(self.x + self.padding + caretX, self.y + self.padding, self.x +
                  self.padding + caretX, self.y - 2 * self.padding + self.height)
@@ -102,16 +91,14 @@ class Input(Element):
                 # print(gameManager.layerManager.controlPressed)
                 
                 if event.key == BACKSPACE:
-                    self.text = self.text[:self.caretPos -
-                                          1] + self.text[self.caretPos:]
-                    self.caretPos -= 1
+                    if len(self.text) > 0:
+                        self.text = self.text[:-1]
                     self.counter = frameRate * 0.6
                     return
             
-                if event.key == TAB or event.key == ENTER or event.key == CONTROL:
+                elif event.key == TAB or event.key == ENTER or event.key == CONTROL:
                     return
             
-                self.text = self.text[:self.caretPos] + \
-                    event.key + self.text[self.caretPos:]
-                self.caretPos += 1
+                elif 31 < ord(event.key) < 127 or 160 < ord(event.key) < 384:
+                    self.text += event.key
                 self.counter = frameRate * 0.6
