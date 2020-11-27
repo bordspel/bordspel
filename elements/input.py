@@ -38,7 +38,7 @@ class Input(Element):
         # Create the text inside of the input.
         textSize(self.textSize)
         textAlign(LEFT, CENTER)
-        fill(self.textColor)
+        fill(self.textColor if len(self.text) > 0 else "#AAAAAA")
         
         # Update the counter, this is used to display the | at the end.
         character = ""
