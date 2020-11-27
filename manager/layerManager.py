@@ -30,6 +30,7 @@ class LayerManager:
     def setActiveLayer(self, name):
         def setActive(layer):
             self.activeLayer = layer
+            self.customCursors.clear()
 
             return layer
 

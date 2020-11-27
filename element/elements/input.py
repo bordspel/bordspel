@@ -1,6 +1,6 @@
 from manager.gameManager import gameManager
 
-from elements.element import Element
+from element.element import Element
 
 """
 Allows you to add a functioning input field to a Layer.
