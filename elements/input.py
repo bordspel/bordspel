@@ -56,12 +56,7 @@ class Input(Element):
         while textWidth(self.text[start:]) > self.width - 2 * self.padding:
             start += 1
         self.viewOffset = start
-        if self.caretPos < self.viewOffset:
-            self.viewOffset = self.caretPos
-            stop = len(self.text) - (self.viewOffset - self.caretPos)
-        else:
-            stop = len(self.text)
-        s = self.text[self.viewOffset:stop] if len(
+        s = self.text[self.viewOffset:] if len(
             self.text) > 0 else self.placeholder
         text(s, self.x + self.padding, self.y + (self.height / 2))
         
@@ -98,9 +93,9 @@ class Input(Element):
                 # print(layerManager.controlPressed)
                 
                 if event.key == BACKSPACE:
-                    self.text = self.text[:self.caretPos -
-                                          1] + self.text[self.caretPos:]
-                    self.caretPos -= 1
+                    if len(self.text) > 0:
+                        self.text = self.text[:-1]
+                        self.caretPos -= 1
                     self.counter = frameRate * 0.6
                     return
             
