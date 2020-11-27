@@ -1,7 +1,7 @@
 from manager.imageManager import ImageManager
 from manager.audioManager import AudioManager
 from manager.dependencyManager import DependencyManager
-from elements.layer import LayerManager
+from manager.layerManager import LayerManager
 
 from networking.client import *
 
