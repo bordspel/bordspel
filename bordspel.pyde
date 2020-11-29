@@ -1,4 +1,5 @@
 from settings import *
+from minigames.mario import marioMinigame
 
 from manager.gameManager import gameManager
 
