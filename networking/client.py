@@ -1,15 +1,15 @@
+# http://pypi.python.org/pypi/websocket-client/
+# from websocket import *
+
 import socket
 import json
 import threading
 import random
 import string
 
-from settings import *
-
 class Client:
 
     def __init__(self):
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.listeners = []
 
         self.id = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(16))
@@ -21,7 +21,7 @@ class Client:
 
     def connect(self):
         try:
-            self.sock.connect((socketIP, socketPort))
+            self.sock = create_connection("ws://localhost:8080")
             
             self.listenerThread = threading.Thread(target=self.listen)
             self.listenerThread.start()
@@ -38,7 +38,7 @@ class Client:
         try:
             self.sock.send(json.dumps(data))
         except:
-            pass
+            print("Exception while trying to send data to the server.")
 
     def listen(self):
         self.running = True
@@ -46,8 +46,8 @@ class Client:
 
         while self.running:
             try:
-                message = self.sock.recv(4096)
-                
+                message = self.sock.recv()
+
                 if message != None:
                     message = json.loads(message)
                     for l in self.listeners:
@@ -60,3 +60,6 @@ class Client:
 
         self.running = False
         self.sock.close()
+
+def listen(client, data):
+    print(data)
