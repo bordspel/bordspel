@@ -2,11 +2,6 @@ from settings import *
 
 from manager.gameManager import gameManager
 
-def drawF(layer, element):
-    fill(0)
-    noStroke()
-    rect(100, 100, 100, 100)
-
 # Setup function.
 def setup():
     size(screenWidth, screenHeight)
