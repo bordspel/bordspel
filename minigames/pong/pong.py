@@ -1,4 +1,12 @@
 from manager.gameManager import gameManager
+import random as rd
+
+gameManager.audioManager.loadAudio("minigames\\pong\\pop.mp3")
+gameManager.audioManager.loadAudio("minigames\\pong\\block.mp3")
+gameManager.audioManager.loadAudio("minigames\\pong\\blockH.mp3")
+gameManager.audioManager.loadAudio("minigames\\pong\\blockM.mp3")
+gameManager.audioManager.loadAudio("minigames\\pong\\blockL.mp3")
+
 aDown = False
 aUp = False
 bDown = False
@@ -11,6 +19,18 @@ scoreA = 0
 scoreB = 0
 
 particles = []
+
+def randomBlockSound():
+    blockSound = rd.randint(1,3)
+    if blockSound == 1:
+        gameManager.audioManager.getAudio("minigames\\pong\\blockH.mp3").rewind()
+        gameManager.audioManager.getAudio("minigames\\pong\\blockH.mp3").play()   
+    if blockSound == 2:
+        gameManager.audioManager.getAudio("minigames\\pong\\blockM.mp3").rewind()
+        gameManager.audioManager.getAudio("minigames\\pong\\blockM.mp3").play()   
+    if blockSound == 3:
+        gameManager.audioManager.getAudio("minigames\\pong\\blockL.mp3").rewind()
+        gameManager.audioManager.getAudio("minigames\\pong\\blockL.mp3").play()   
 
 def onSetup():
     global w, h, ballX, ballY, ballSize, ballTrail, paddleWidth, paddleHeight, a, b, img
@@ -107,6 +127,7 @@ def onDraw(layer,element):
     if ballX < paddleWidth + ballSize/2 and a <= ballY <= a + paddleHeight:
         ballVelocityX = 1
         particles += [newParticles(ballX, ballY, False)]
+        randomBlockSound()
     if ballX > w:
         scoreA += 1
         particles += [newParticles(ballX, ballY, True, True)]
@@ -114,6 +135,7 @@ def onDraw(layer,element):
     if ballX > w - paddleWidth - ballSize/2 and b <= ballY <= b + paddleHeight:
         ballVelocityX = -1
         particles += [newParticles(ballX, ballY, True)]
+        randomBlockSound()
     if ballY < 0 + ballSize/2:
         ballVelocityY = 1
     if ballY > h - ballSize/2:
@@ -123,6 +145,9 @@ def onDraw(layer,element):
 def resetBall():
     global ballX, ballY, ballTrail, ballVelocityX, ballVelocityY, ballSpeed, ballSize
     
+    gameManager.audioManager.getAudio("minigames\\pong\\pop.mp3").rewind()
+    gameManager.audioManager.getAudio("minigames\\pong\\pop.mp3").play()
+
     ballX = w/2
     ballY = h/2
     ballTrail = [(ballX, ballY)]
