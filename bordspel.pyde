@@ -1,5 +1,6 @@
 from settings import *
-from minigames.mario import marioMinigame
+# from minigames.mario import marioMinigame
+from minigames.pong.pong import *
 
 from manager.gameManager import gameManager
 
