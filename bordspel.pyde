@@ -16,6 +16,8 @@ def setup():
         
     # Select the current active Layer.
     background(255)
+    
+    onSetup()
 
 
 def stop():

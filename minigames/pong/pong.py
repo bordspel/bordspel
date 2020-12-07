@@ -12,9 +12,10 @@ scoreB = 0
 
 particles = []
 
-def setup():
+def onSetup():
     global w, h, ballX, ballY, ballSize, ballTrail, paddleWidth, paddleHeight, a, b, img
     
+    # Note: This needs to be changed to use the imageManager.
     img = loadImage("minigames\\pong\\background.jpg")
 
     noStroke()
@@ -36,10 +37,10 @@ def setup():
     
     resetBall()
 
-def draw(layer,element):
+def onDraw(layer,element):
     global a, b, ballX, ballY, ballTrail, ballVelocityX, ballVelocityY, ballSpeed, scoreA, scoreB, particles
     if frameCount == 1:
-        setup()
+        onSetup()
     background(img)
     
     # ball
@@ -130,12 +131,6 @@ def resetBall():
     ballSpeed = .75
     ballSize = h / 15
 
-def keyPressed():
-    handleKeys(True)
-
-def keyReleased():
-    handleKeys(False)
-
 def handleKeys(val):
     global aUp
     global aDown
@@ -159,7 +154,7 @@ def newParticles(x, y, right, big=False):
             big
         ]
 
-def onKeyPress(event):
+def onKeyEvent(event):
     global keyPressed
     if event.type == "PRESS":
         handleKeys(True)
@@ -170,5 +165,5 @@ minigamePong = gameManager.layerManager.createLayer("minigamePong")
 gameManager.layerManager.setActiveLayerByName("minigamePong")
 element = minigamePong.createElement('Pong', 0, 0) 
 
-element.registerDrawListener(draw)
-element.registerKeyListener(onKeyPress)
+element.registerDrawListener(onDraw)
+element.registerKeyListener(onKeyEvent)
