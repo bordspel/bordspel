@@ -8,7 +8,7 @@ class MarioMinigame:
         gameManager.layerManager.setActiveLayerByName("minigame-mario")
 
         self.marioMap = MarioMap(self, self.layer)
-        #self.marioEnemy = MarioEnemy(self.layer, 100, 300, 400, 300)
+        # self.marioEnemy = MarioEnemy(self, self.layer, 100, 300, 400, 350)
         self.marioPlayer = MarioPlayer(self, self.layer, self.marioMap, 200, 350)
 
         self.keyListener = self.layer.createElement("minigame-mario-keylistener")
@@ -100,6 +100,7 @@ class MarioPlayer:
         self.inJump = True
 
     def draw(self, layer, element):
+        fill(77, 170, 46)
         rect(element.x, element.y, self.width, self.height)
 
         if self.map.xOffset > 0 and element.x < self.startX:
@@ -164,7 +165,8 @@ class MarioPlayer:
 
 class MarioEnemy:
 
-    def __init__(self, layer, xStart, yStart, xEnd, yEnd):
+    def __init__(self, minigame, layer, xStart, yStart, xEnd, yEnd):
+        self.minigame = minigame
         self.layer = layer
 
         self.xStart = xStart
@@ -182,7 +184,8 @@ class MarioEnemy:
         self.element.registerDrawListener(self.draw)
 
     def draw(self, layer, element):
-        rect(element.x, element.y, 50, 50)
+        fill(220, 62, 25)
+        rect(self.minigame.marioMap.xOffset - element.x, element.y, 50, 50)
         if element.x + self.width <= self.xStart + self.width:
             self.direction = 1
         if element.x >= self.xEnd:
