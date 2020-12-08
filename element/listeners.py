@@ -40,8 +40,8 @@ def keyTyped():
     
 # This doesn't work for some reason.
 # https://py.processing.org/reference/keyPressed.html
-def keyPressed():
-    gameManager.layerManager.__callKey__("pressed")
-    
 def keyReleased():
     gameManager.layerManager.__callKey__("released")
+
+def keyPressed():
+    gameManager.layerManager.__callKey__("pressed")
