@@ -1,5 +1,8 @@
 from manager.gameManager import gameManager
-from settings import screenWidth
+
+from minigames.mario.marioPlayer import MarioPlayer
+from minigames.mario.marioMap import *
+from minigames.mario.bodies import *
 
 class MarioMinigame:
 
@@ -7,14 +10,23 @@ class MarioMinigame:
         self.layer = gameManager.layerManager.createLayer("minigame-mario")
         gameManager.layerManager.setActiveLayerByName("minigame-mario")
 
+        self.enemies = []
+
+        self.physicsManager = PhysicsManager(self)
+
         self.marioMap = MarioMap(self, self.layer)
-        # self.marioEnemy = MarioEnemy(self, self.layer, 100, 300, 400, 350)
-        self.marioPlayer = MarioPlayer(self, self.layer, self.marioMap, 200, 350)
+        self.enemies.append(MarioEnemy(self, self.layer, 650, 138, 850, 138))
+        self.enemies.append(MarioEnemy(self, self.layer, 3025, 308, 3225, 308))
+        self.marioTarget = MarioTarget(self, self.layer, 4000, 278, 50, 100)
+        self.marioPlayer = MarioPlayer(self, self.layer, self.marioMap, 200, 200)
 
         self.keyListener = self.layer.createElement("minigame-mario-keylistener")
         self.keyListener.registerKeyListener(self.key)
 
-        self.speedX = 12
+        self.finished = False
+        self.otherPlayerFinished = False
+
+        self.speedX = 4
         self.key = ""
 
     def key(self, event):
@@ -29,145 +41,13 @@ class MarioMinigame:
             if event.key == "d":
                  self.key = ""
 
-class MarioMap:
-
-    def __init__(self, minigame, layer):
-        self.floor = [(i, 400) for i in range(-500, 500)] + [(i, 350) for i in range(500, 1000)]
-        
-        self.minigame = minigame
-        self.layer = layer
-        self.element = self.layer.createElement("MarioMap", 0, 0)
-        self.element.registerDrawListener(self.draw)
-
-        self.directionX = 0
-        self.xOffset = 0
-
-    def getVisibleFloor(self):
-        visibleFloor = []
-        for i in range(int(self.xOffset), int(self.xOffset) + screenWidth + 1):
-            f = self.floor[i]
-            visibleFloor.append((i - int(self.xOffset), f[1]))
-        return visibleFloor
-
-    def isMoreFloor(self):
-        if self.xOffset + self.minigame.speedX >= self.floor[-1][0]:
-            return False
-        if self.xOffset - self.minigame.speedX + screenWidth <= self.floor[0][0]:
-            return False
-        return True
-
-    def draw(self, element, layer):
-        for f in self.getVisibleFloor():
-            point(f[0], f[1])
-
-        if self.minigame.key == "a":
-            self.directionX = -self.minigame.speedX
-        elif self.minigame.key == "d":
-            self.directionX = self.minigame.speedX
-        else:
-            self.directionX = 0
-
-        if self.isMoreFloor():
-            self.xOffset += self.directionX
-
-
-class MarioPlayer:
-
-    def __init__(self, minigame, layer, map, startX, startY):
-        self.minigame = minigame
-        self.layer = layer
-        self.map = map
-
-        self.startX = startX
-        self.startY = startY
-
-        self.width = 50
-        self.height = 50
-
-        self.directionY = 0
-        self.directionX = 0
-
-        self.jumpY = 0
-        self.inJump = False
-
-        self.element = self.layer.createElement("MarioPlayer", self.startX, self.startY)
-        self.element.registerDrawListener(self.draw)
-        self.element.registerKeyListener(self.key)
-    
-    def jump(self):
-        self.directionY = -2
-        self.jumpY = self.element.y - 100
-        self.inJump = True
-
-    def draw(self, layer, element):
-        fill(77, 170, 46)
-        rect(element.x, element.y, self.width, self.height)
-
-        if self.map.xOffset > 0 and element.x < self.startX:
-            self.map.xOffset -= self.minigame.speedX
-        if self.map.xOffset < 0 and element.x + self.width > screenWidth - self.startX:
-            self.map.xOffset += self.minigame.speedX
-
-        # Get the floor at the left and right of the Player hitbox.
-        left = [c for c in self.map.getVisibleFloor() if c[0] == int(element.x)][0]
-        right = [c for c in self.map.getVisibleFloor() if c[0] == int(element.x) + self.width][0]
-        
-        # Prevent the x from going outside of the map.
-        if element.x + self.directionX <= 1 or element.x + self.directionX >= screenWidth:
-            self.directionX = 0
-
-        # Prevent the Player from going through the floor.
-        if (element.y + self.height >= left[1] or element.y + self.height >= right[1]) and self.directionY > 0:
-            self.directionY = 0
-            self.inJump = False
-
-        # Prevent the Player from going up the floor.
-        # TODO.
-
-        # Let the player fall when they are not on the floor.
-        if element.y + self.height != left[1] and element.y + self.height != right[1] and not self.inJump:
-            self.directionY = 2
-
-        # When the player jumps ensure that they come back to the ground.
-        if self.directionY < 0:
-            if element.y <= self.jumpY and self.inJump:
-                self.directionY = 2
-
-        # Check the keys.
-        if not self.map.isMoreFloor():
-            if self.minigame.key == "a":
-                self.directionX = -self.minigame.speedX
-            elif self.minigame.key == "d":
-                self.directionX = self.minigame.speedX
-            else:
-                self.directionX = 0
-
-        # Prevent the Player from going outside of the map.
-        if not self.map.isMoreFloor():
-            if element.x + self.width + self.directionX >= screenWidth:
-                self.directionX = 0
-            if element.x + self.directionX <= 0:
-                self.directionX = 0
-            element.x += self.directionX
-        else:
-            # self.map.directionX = self.directionX
-            self.directionX = 0
-            element.x = self.startX
-
-        element.y += self.directionY
-
-    def key(self, event):
-        # Detect the spacebar for jumps.
-        if event.key == " " and not self.inJump and event.type == "PRESS":
-            self.jump()
-
-            
-
 class MarioEnemy:
 
     def __init__(self, minigame, layer, xStart, yStart, xEnd, yEnd):
         self.minigame = minigame
         self.layer = layer
+
+        self.body = PhysicsBody(minigame.physicsManager, layer, xStart, yStart, 100, 100)
 
         self.xStart = xStart
         self.yStart = yStart
@@ -175,21 +55,91 @@ class MarioEnemy:
         self.xEnd = xEnd
         self.yEnd = yEnd
 
-        self.width = 100
-        self.height = 100
+        self.width = 50
+        self.height = 50
 
-        self.direction = 1
+        self.hitAnimation = 0
 
         self.element = self.layer.createElement("MarioEnemy", xStart, yStart)
         self.element.registerDrawListener(self.draw)
 
     def draw(self, layer, element):
-        fill(220, 62, 25)
-        rect(self.minigame.marioMap.xOffset - element.x, element.y, 50, 50)
-        if element.x + self.width <= self.xStart + self.width:
-            self.direction = 1
-        if element.x >= self.xEnd:
-            self.direction = -1
-        element.x += self.direction
+        x, y = CoordinatesUtil.toProcessingCoords(self.body.x, self.body.y)
+
+        # Switch direction when the Enemy is out of their area.
+        if self.body.x + self.width <= self.xStart + self.width:
+            self.body.direction.xVelocity = 1
+        if self.body.x >= self.xEnd:
+            self.body.direction.xVelocity = -1
+
+        # When the Player collides with the enemy show the animation and remove a heart.
+        if self.isCollidingWithPlayer() and self.hitAnimation == 0:
+            self.hitAnimation += 1
+            self.minigame.marioPlayer.hp -= 1
+
+        if self.hitAnimation > 0:
+            self.hitAnimation += 1
+
+            if self.hitAnimation > 60:
+                self.hitAnimation = 0
+
+        if self.hitAnimation % 8 == 0:
+            fill(220, 62, 25)
+            rect(x - self.minigame.marioMap.xOffset, y, self.width, self.height)
+        else:
+            fill(255)
+            rect(x - self.minigame.marioMap.xOffset, y, self.width, self.height)
+
+    def isCollidingWithPlayer(self):
+        """
+        Returns True if this enemy is colliding with the Player.
+        """
+        px, py = self.minigame.marioPlayer.body.x, self.minigame.marioPlayer.body.y
+        w, h = self.minigame.marioPlayer.width, self.minigame.marioPlayer.height
+        xOffset = self.minigame.marioMap.xOffset
+
+        return px + xOffset < self.body.x + self.width and\
+            px + xOffset + w > self.body.x and\
+            py < self.body.y + self.height and\
+            py + h > self.body.y
+
+class MarioTarget:
+
+    def __init__(self, minigame, layer, x, y, width, height):
+        self.minigame = minigame
+        self.layer = layer
+
+        self.x = x
+        self.y = y + height
+
+        self.width = width
+        self.height = height
+
+        self.element = self.layer.createElement("MarioTarget")
+        self.element.registerDrawListener(self.draw)
+
+    def draw(self, layer, element):
+        xOffset = self.minigame.marioMap.xOffset
+        x, y = CoordinatesUtil.toProcessingCoords(self.x, self.y)
+        x -= xOffset
+
+        fill(0)
+        rect(x, y, self.width, self.height)
+        
+        if self.isCollidingWithPlayer():
+            self.minigame.finished = True
+
+    def isCollidingWithPlayer(self):
+        """
+        Returns True if this enemy is colliding with the Player.
+        """
+        px, py = self.minigame.marioPlayer.body.x, self.minigame.marioPlayer.body.y
+        w, h = self.minigame.marioPlayer.width, self.minigame.marioPlayer.height
+        xOffset = self.minigame.marioMap.xOffset
+
+        return px + xOffset < self.x + self.width and\
+            px + xOffset + w > self.x and\
+            py < self.y + self.height and\
+            py + h > self.y
 
 marioMinigame = MarioMinigame()

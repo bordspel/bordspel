@@ -23,5 +23,13 @@ class GameManager:
 
         # self.client = Client()
         # self.client.connect()
+        
+        self.imageManager.loadImage("./assets/mario/heart.png")
+
+        self.imageManager.loadImage("./assets/mario/tooltip-movement.png")
+        self.imageManager.loadImage("./assets/mario/tooltip-jump.png")
+
+        self.imageManager.loadImage("./assets/mario/player.png")
+        self.imageManager.loadImage("./assets/mario/player-moving.png")
 
 gameManager = GameManager()

@@ -1,0 +1,5 @@
+Wat moet er custom:
+
+Er moet niet te veel verschil in zitten omdat de animatie er dan niet uit gaat zien.
+- player.png
+- player-moving.png
