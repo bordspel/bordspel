@@ -1,6 +1,5 @@
 from settings import *
-from minigames.mario import marioMinigame
-
+from minigames.steekspel.steekspel import *
 from manager.gameManager import gameManager
 
 # Setup function.
