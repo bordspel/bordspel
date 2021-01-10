@@ -17,8 +17,7 @@ def setup():
 
 
 def stop():
-    pass
-    # gameManager.client.close()
+    gameManager.client.close()
 
 def draw():
     pass

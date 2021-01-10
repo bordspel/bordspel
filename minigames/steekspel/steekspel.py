@@ -76,6 +76,13 @@ def drawMeter(layer, element):
     if score > 0:
         meterDelay += 1
         if meterDelay >= 130:
+            # =================================
+            # = CODE VAN NETWORKING!          =
+            # = Stuur de score naar de server =
+            # =================================
+            gameManager.client.send("steekspel", {"score": score})
+
+            # DIT MOET NAAR DE FUNCTIE `networkListener()` toe!!!!
             layer.removeElement(elementMeter)
             elementMeter.unregisterDrawListener(drawMeter)
             elementSpeler1.registerDrawListener(drawSpeler)
@@ -138,6 +145,18 @@ def resetSteekspel():
 
 def drawBackground(layer, element):
     background(254, 127, 156)
+
+# Dit bepaald wie de winnaar is.
+def networkListener(client, data):
+    print(data)
+
+    if data["type"] == "steekspel":
+        winner = gameManager.client.id == data["winner"]
+
+        # HIER MOET DE CODE VAN DE WIN/LOSE ANIMATIE KOMEN
+        print(winner)
+
+gameManager.client.register_listener(networkListener)
 
 elementSpeler1 = layer.createElement("Speler1", x_speler1, y_speler1)
 

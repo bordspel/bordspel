@@ -21,7 +21,7 @@ class GameManager:
         # self.layerManager = LayerManager()
         self.layerManager = LayerManager(this)
 
-        # self.client = Client()
-        # self.client.connect()
+        self.client = Client()
+        self.client.connect()
 
 gameManager = GameManager()

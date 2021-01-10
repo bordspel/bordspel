@@ -1,5 +1,6 @@
 # http://pypi.python.org/pypi/websocket-client/
 # from websocket import *
+from settings import *
 
 import socket
 import json
@@ -11,6 +12,7 @@ class Client:
 
     def __init__(self):
         self.listeners = []
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         self.id = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(16))
         self.room = "room123"
@@ -21,7 +23,8 @@ class Client:
 
     def connect(self):
         try:
-            self.sock = create_connection("ws://localhost:8080")
+            # self.sock = create_connection("ws://localhost:8080")
+            self.sock.connect((socketIP, socketPort))
             
             self.listenerThread = threading.Thread(target=self.listen)
             self.listenerThread.start()
@@ -46,7 +49,7 @@ class Client:
 
         while self.running:
             try:
-                message = self.sock.recv()
+                message = self.sock.recv(4096)
 
                 if message != None:
                     message = json.loads(message)
