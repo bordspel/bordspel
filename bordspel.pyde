@@ -1,6 +1,9 @@
 from settings import *
 from minigames.mario.mario import *
 
+import menu.main
+import menu.beforeLobby
+
 from manager.gameManager import gameManager
 
 # Setup function.

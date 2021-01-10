@@ -24,6 +24,10 @@ class GameManager:
         # self.client = Client()
         # self.client.connect()
         
+        # All Menu images.
+        self.imageManager.loadImage("./assets/menu/main-background.png")
+
+        # All Mario images.
         self.imageManager.loadImage("./assets/mario/heart.png")
 
         self.imageManager.loadImage("./assets/mario/tooltip-movement.png")
