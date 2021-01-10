@@ -148,13 +148,13 @@ def drawBackground(layer, element):
 
 # Dit bepaald wie de winnaar is.
 def networkListener(client, data):
-    print(data)
-
     if data["type"] == "steekspel":
         winner = gameManager.client.id == data["winner"]
+        gelijkspel = data["winner"] == "NONE"
 
         # HIER MOET DE CODE VAN DE WIN/LOSE ANIMATIE KOMEN
         print(winner)
+        print(gelijkspel)
 
 gameManager.client.register_listener(networkListener)
 
