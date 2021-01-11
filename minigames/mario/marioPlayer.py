@@ -1,6 +1,6 @@
 from settings import screenWidth, screenHeight
 from manager.gameManager import gameManager
-from minigames.mario.bodies import PhysicsBody
+from minigames.mario.bodies import PhysicsBody, CoordinatesUtil
 
 class MarioPlayer:
 
@@ -24,6 +24,7 @@ class MarioPlayer:
         self.timer = 0
 
         self.tooltipTimer = 0
+        self.moving = False
 
         self.body = PhysicsBody(self.minigame.physicsManager, self.layer, startX, startY, self.width, self.height, collidable=True, friction=True, gravity=True, bottomCollision=True, xOffset=True)
         self.body.element.registerDrawListener(self.draw)
@@ -39,17 +40,20 @@ class MarioPlayer:
 
         playerImage = "./assets/mario/player.png"
         if self.body.direction.xVelocity != 0 or self.previousXOffset != self.map.xOffset:
+            self.moving = True
             if (self.timer % 30) >= 15:
                 playerImage = "./assets/mario/player-moving.png"
+        else:
+            self.moving = False
 
         if self.facing == "LEFT":
             pushMatrix()
             translate(self.width + element.x, 0)
             scale(-1, 1)
-            image(gameManager.imageManager.getImage(playerImage), 0, element.y)
+            image(gameManager.imageManager.getImage(playerImage), 0, element.y + 3)
             popMatrix()
         else:
-            image(gameManager.imageManager.getImage(playerImage), element.x, element.y)
+            image(gameManager.imageManager.getImage(playerImage), element.x, element.y + 3)
 
         # Draw the tooltips at the start of the game.
         if self.tooltipTimer <= 300:
@@ -72,8 +76,7 @@ class MarioPlayer:
         textSize(30)
         text(str(round(self.timer / 60.0, 1)), screenWidth - 100, 75)
 
-        if self.started:
-            self.timer += 1
+        self.timer += 1
 
         # Check the keys.
         self.previousXOffset = self.map.xOffset
@@ -122,6 +125,10 @@ class MarioPlayer:
             #TODO
             #element.hide()
 
+        # Send the position of the Player to the client.
+        if frameCount % 3 == 0:
+            gameManager.client.send("mario", {"action": "position", "player": gameManager.client.id, "x": self.body.x, "y": self.body.y, "xOffset": self.map.xOffset, "direction": self.facing, "moving": self.moving})
+
     def reset(self, first=False):
         """
         Resets the Player and the Map.
@@ -151,3 +158,48 @@ class MarioPlayer:
         if event.key == " " and event.type == "PRESS" and self.isOnGround():
             self.started = True
             self.jump()
+        
+class MarioEnemyPlayer:
+
+    def __init__(self, minigame, layer, x, y):
+        self.layer = layer
+        self.minigame = minigame
+
+        self.x, self.y = CoordinatesUtil.toProcessingCoords(x, y)
+        self.xOffset = 0
+        self.direction = "RIGHT"
+        self.moving = False
+
+        self.width = 36
+        self.height = 50
+
+        self.element = self.layer.createElement("MarioEnemyPlayer", self.x, self.y)
+        self.element.registerDrawListener(self.draw)
+
+        gameManager.client.register_listener(self.networkListener)
+
+    def draw(self, layer, element):
+        playerImage = "./assets/mario/player.png"
+        if self.moving:
+            if (frameCount % 30) >= 15:
+                playerImage = "./assets/mario/player-moving.png"
+
+        if self.direction == "LEFT":
+            pushMatrix()
+            translate(self.width + element.x - self.minigame.marioMap.xOffset + self.xOffset, 0)
+            scale(-1, 1)
+            image(gameManager.imageManager.getImage(playerImage), 0, element.y + self.height + 3)
+            popMatrix()
+        else:
+            image(gameManager.imageManager.getImage(playerImage), element.x - self.minigame.marioMap.xOffset + self.xOffset, element.y + self.height + 3)
+        
+    def networkListener(self, client, data):
+        if data["type"] == "mario" and data["action"] == "position":
+            if data["player"] != client.id:
+                x, y = CoordinatesUtil.toProcessingCoords(data["x"], data["y"] + self.height)
+                self.xOffset = data["xOffset"]
+                self.direction = data["direction"]
+                self.moving = data["moving"]
+
+                self.element.x = x
+                self.element.y = y

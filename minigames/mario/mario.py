@@ -1,8 +1,10 @@
 from manager.gameManager import gameManager
 
-from minigames.mario.marioPlayer import MarioPlayer
+from minigames.mario.marioPlayer import MarioPlayer, MarioEnemyPlayer
 from minigames.mario.marioMap import *
 from minigames.mario.bodies import *
+
+from bordspel.library.element.custom import *
 
 class MarioMinigame:
 
@@ -18,16 +20,21 @@ class MarioMinigame:
         self.enemies.append(MarioEnemy(self, self.layer, 650, 138, 850, 138))
         self.enemies.append(MarioEnemy(self, self.layer, 3025, 308, 3225, 308))
         self.marioTarget = MarioTarget(self, self.layer, 4000, 278, 50, 100)
+
+        # self.marioTarget = MarioTarget(self, self.layer, 400, 150, 50, 100)
+
+        self.marioEnemyPlayer = MarioEnemyPlayer(self, self.layer, 200, 200)
         self.marioPlayer = MarioPlayer(self, self.layer, self.marioMap, 200, 200)
 
         self.keyListener = self.layer.createElement("minigame-mario-keylistener")
         self.keyListener.registerKeyListener(self.key)
 
         self.finished = False
-        self.otherPlayerFinished = False
 
         self.speedX = 4
         self.key = ""
+
+        gameManager.client.register_listener(self.networkListener)
 
     def key(self, event):
         if event.type == "PRESS":
@@ -40,6 +47,34 @@ class MarioMinigame:
                  self.key = ""
             if event.key == "d":
                  self.key = ""
+
+    def networkListener(self, client, data):
+        if data["type"] == "mario" and data["action"] == "win":
+            winner = data["player"] == gameManager.client.id
+
+            if not self.finished:
+                self.finished = True
+
+                print(winner)
+
+                self.hide()
+
+                self.endScreen = MarioEndScreen(self, self.layer, winner)
+
+    def hide(self):
+        self.marioMap.element.unregisterDrawListener(self.marioMap.draw)
+
+        for enemy in self.enemies:
+            enemy.element.unregisterDrawListener(enemy.draw)
+
+        self.marioEnemyPlayer.element.unregisterDrawListener(self.marioEnemyPlayer.draw)
+
+        self.marioPlayer.body.element.unregisterDrawListener(self.marioPlayer.draw)
+        self.marioPlayer.body.element.unregisterKeyListener(self.marioPlayer.key)
+
+        self.keyListener.unregisterKeyListener(self.key)
+
+        self.marioTarget.element.unregisterDrawListener(self.marioTarget.draw)
 
 class MarioEnemy:
 
@@ -83,13 +118,19 @@ class MarioEnemy:
             if self.hitAnimation > 60:
                 self.hitAnimation = 0
 
-        if self.hitAnimation % 8 == 0:
-            fill(220, 62, 25)
-            rect(x - self.minigame.marioMap.xOffset, y, self.width, self.height)
-        else:
-            fill(255)
-            rect(x - self.minigame.marioMap.xOffset, y, self.width, self.height)
-
+        if self.hitAnimation % 20 < 10:
+            if self.body.direction.xVelocity == 1:
+                pushMatrix()
+                translate(x - self.minigame.marioMap.xOffset, 0)
+                scale(-1, 1)
+                image(gameManager.imageManager.getImage("./assets/mario/enemy.png"), 0, y - 5)
+                popMatrix()
+            else:
+                pushMatrix()
+                translate(x - self.minigame.marioMap.xOffset, 0)
+                image(gameManager.imageManager.getImage("./assets/mario/enemy.png"), 0, y - 5)
+                popMatrix()
+                
     def isCollidingWithPlayer(self):
         """
         Returns True if this enemy is colliding with the Player.
@@ -127,7 +168,9 @@ class MarioTarget:
         rect(x, y, self.width, self.height)
         
         if self.isCollidingWithPlayer():
-            self.minigame.finished = True
+
+            for i in range(0, 15):
+                gameManager.client.send("mario", {"action": "win", "player": gameManager.client.id})
 
     def isCollidingWithPlayer(self):
         """
@@ -141,5 +184,45 @@ class MarioTarget:
             px + xOffset + w > self.x and\
             py < self.y + self.height and\
             py + h > self.y
+
+class MarioEndScreen:
+
+    def __init__(self, minigame, layer, winner):
+        self.minigame = minigame
+        self.layer = layer
+
+        self.counter = self.layer.createElement("counter")
+        self.counter.registerDrawListener(self.tick)
+
+        self.count = 0
+
+        if winner:
+            result = "Je hebt gewonnen!"
+            result2 = "Je krijgt ... Dukaten en ... Charisma."
+        else:
+            result = "Je hebt verloren!"
+            result2 = "Je verliest ... Dukaten en ... Charisma."
+
+        self.text = Text("TextEndScreen", screenWidth / 2, screenHeight / 2 - 50, result)
+        self.text.setTextSize(40)
+
+        self.text2 = Text("TextEndScreen", screenWidth / 2, screenHeight / 2 + 50, result2)
+        self.text2.setTextSize(30)
+
+        self.layer.addElement(self.text)
+        self.layer.addElement(self.text2)
+
+    def tick(self, layer, element):
+        self.count += 1
+
+        if self.count >= 360:
+            self.layer.removeElement(self.text)
+            self.layer.removeElement(self.text2)
+
+            self.counter.unregisterDrawListener(self.tick)
+
+            gameManager.layerManager.removeLayerByName("minigame-mario")
+
+            MarioMinigame()
 
 marioMinigame = MarioMinigame()

@@ -21,8 +21,8 @@ class GameManager:
         # self.layerManager = LayerManager()
         self.layerManager = LayerManager(this)
 
-        # self.client = Client()
-        # self.client.connect()
+        self.client = Client()
+        self.client.connect()
         
         # All Menu images.
         self.imageManager.loadImage("./assets/menu/main-background.png")
@@ -35,5 +35,7 @@ class GameManager:
 
         self.imageManager.loadImage("./assets/mario/player.png")
         self.imageManager.loadImage("./assets/mario/player-moving.png")
+
+        self.imageManager.loadImage("./assets/mario/enemy.png")
 
 gameManager = GameManager()

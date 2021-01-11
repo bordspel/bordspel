@@ -1,6 +1,8 @@
 from bordspel.library.element import LayerManager
 from bordspel.library.element.custom import *
 
+from settings import *
+
 class PhysicsDirection:
 
     NONE = "NONE"
@@ -202,30 +204,8 @@ class CoordinatesUtil:
 
     @staticmethod
     def toProcessingCoords(x, y):
-        return (x, height - y)
+        return (x, screenHeight - y)
 
     @staticmethod
     def toRegularCoords(x, y):
-        return (x, height - y)
-
-"""
-layerManager = LayerManager(this)
-
-layer = layerManager.createLayer("menu")
-layerManager.setActiveLayerByName("menu")
-
-physicsManager = PhysicsManager()
-
-body = PhysicsBody(physicsManager, layer, 200, 450, 100, 100, collidable=True, gravity=True, friction=True)
-# body.direction.yVelocity = 3
-body2 = PhysicsBody(physicsManager, layer, 200, 100, 100, 100)
-
-physicsManager.bodies = [body, body2]
-
-def drawBody(layer, element):
-    fill(0)
-    rect(element.x, element.y, 100, 100)
-
-body.element.registerDrawListener(drawBody)
-body2.element.registerDrawListener(drawBody)
-"""
+        return (x, screenHeight - y)
