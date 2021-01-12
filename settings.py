@@ -2,8 +2,8 @@
 Screen width and height.
 Note: This will be used in the future for scaling.
 """
-screenWidth = 1920  
-screenHeight = 1080
+screenWidth = 1280  
+screenHeight = 720
 """
 Socket settings
 """

@@ -19,6 +19,8 @@ speed = 2
 scoreA = 0
 scoreB = 0
 
+count = 0
+
 particles = []
 
 def randomBlockSound():
@@ -62,7 +64,10 @@ def onSetup():
     
 def onDraw(layer,element):       
     global a, b, ballX, ballY, ballTrail, ballVelocityX, ballVelocityY, ballSpeed, scoreA, scoreB, particles, hp1, hp2
-    background(img)
+    global count
+    # FIX DE BACKGROUND SIZEEEE
+    # background(img)
+    background(0)
     if hp1 >0 and hp2 >0:
         if frameCount == 1:
             onSetup()
@@ -176,6 +181,15 @@ def onDraw(layer,element):
         if ballY > h - ballSize/2:
             ballVelocityY = -1       
         ballSpeed += .0000001 / frameRate * h
+
+        # Counter voor 30 seconds.
+        if count <= (60 * 7) and count != -1:
+            count += 1
+        elif count != -1:
+            count = -1
+
+            gameManager.client.send("pong", {"player": gameManager.client.id, "scorePlayer": scoreA, "scoreBot": scoreB})
+
     else: 
         if hp1 <1:
             winner = "Player 2 has won!"
@@ -230,6 +244,20 @@ def onKeyEvent(event):
         handleKeys(True)
     if event.type == "RELEASE":
         handleKeys(False)
+
+def networkListener(client, data):
+    if data["type"] == "pong":
+        winner = data["winner"]
+
+        #########################################
+        # GEBRUIK DEZE VARIABLES OM OP HET SCHERM TE LATEN ZIEN OF JE GEWONNEN, VERLOREN OF GELIJKSPEL HEBT!!!
+        #########################################
+        gelijkspel = winner == "NONE"
+        gewonnen = winner == client.id
+
+        print(gewonnen, gelijkspel)
+
+gameManager.client.register_listener(networkListener)
       
 minigamePong = gameManager.layerManager.createLayer("minigamePong")
 gameManager.layerManager.setActiveLayerByName("minigamePong")
