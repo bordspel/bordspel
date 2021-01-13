@@ -1,17 +1,25 @@
 from settings import *
-# sfrom minigames.mario.mario import *
 
-import menu.main
-import menu.beforeLobby
+# import menu.main
+# import menu.lobby
 
 from manager.gameManager import gameManager
 
-from custom.input import *
+import minigames.mario.mario
 
-layer = gameManager.layerManager.createLayer("aaaa")
-gameManager.layerManager.setActiveLayerByName("aaaa")
+def playMiniGame(minigame):
+    if minigame == "mario":
+        minigames.mario.mario.MarioMinigame()
+    if minigame == "steekspel":
+        pass
+    if minigame == "pong":
+        pass
+    if minigame == "willem zn spel":
+        pass
 
-i = Input(layer, 100, 100, 300, 100, textColor=255)
+gameManager.connectToServer()
+
+playMiniGame("mario")
 
 # Setup function.
 def setup():

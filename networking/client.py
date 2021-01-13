@@ -14,6 +14,7 @@ class Client:
         self.listeners = []
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
+        self.username = "none"
         self.id = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(16))
         self.room = "room123"
 
@@ -23,7 +24,6 @@ class Client:
 
     def connect(self):
         try:
-            # self.sock = create_connection("ws://localhost:8080")
             self.sock.connect((socketIP, socketPort))
             
             self.listenerThread = threading.Thread(target=self.listen)
@@ -31,7 +31,7 @@ class Client:
         except:
             print("Connection failed while trying to connect to the server.")
 
-        self.send("handshake", {})
+        self.send("handshake", {"username": self.username})
 
     def send(self, type, data):
         data["type"] = type

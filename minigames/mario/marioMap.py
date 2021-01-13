@@ -1,6 +1,8 @@
 from settings import screenWidth, screenHeight
 from minigames.mario.bodies import PhysicsBody, CoordinatesUtil
 
+from manager.gameManager import gameManager
+
 class MarioMap:
     
     def __init__(self, minigame, layer):
@@ -78,10 +80,9 @@ class MarioMap:
             if self.minigame.marioPlayer.body.x + self.xOffset >= block.sx and block != right:
                 left = block
 
-        # print(left, right)
-
     def draw(self, element, layer):
-        # self.getCurrentBlock()
+        # Draw the background.
+        background(gameManager.imageManager.getImage("./assets/mario/background.png"))
 
         fill(0)
         for block in self.blocks:
