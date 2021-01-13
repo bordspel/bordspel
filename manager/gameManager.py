@@ -15,6 +15,9 @@ class GameManager:
         self.dependencyManager = DependencyManager()
 
         self.client = Client()
+
+        self.inGame = False
+        self.inGameCounter = 500
         
         # self.dependencyManager.addDependency("websocket")
         # self.dependencyManager.installDependencies()
@@ -41,6 +44,7 @@ class GameManager:
 
         self.imageManager.loadImage("./assets/mario/castle.png")
         self.imageManager.loadImage("./assets/mario/background.png")
+        
 
     def connectToServer(self):
         self.client.connect()

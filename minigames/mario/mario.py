@@ -223,6 +223,9 @@ class MarioEndScreen:
             self.layer.removeElement(self.text)
             self.layer.removeElement(self.text2)
 
+            gameManager.inGame = False
+            gameManager.inGameCounter = 0
+
             self.counter.unregisterDrawListener(self.tick)
 
             # Switch the layer back to the lobby.

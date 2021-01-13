@@ -121,6 +121,9 @@ class MarioPlayer:
 
         # Check if the Player died.
         if self.hp <= 0:
+            for i in range(0, 61):
+                gameManager.client.send("mario", {"action": "win", "player": ""})
+
             self.minigame.finished = True
             self.minigame.hide()
             self.minigame.showEndScreen(False)

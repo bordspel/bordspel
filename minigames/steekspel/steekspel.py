@@ -131,7 +131,13 @@ def drawEind(layer, element):
         resetSteekspel()
         elementEind.unregisterDrawListener(drawEind)
 
+        gameManager.inGame = False
+        gameManager.inGameCounter = 0
+        gameManager.layerManager.setActiveLayerByName("menu-lobby")
+
 def startSteekspel():
+    resetSteekspel()
+
     gameManager.layerManager.setActiveLayerByName("minigame-steekspel")
     layer.addElement(textIntro)
     elementSpatie.registerKeyListener(keyIntro)

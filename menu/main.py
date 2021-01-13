@@ -11,7 +11,7 @@ def draw(layer, element):
 def mouse(event):
     if event.type == "CLICK" and event.button == "LEFT":
 
-        if button.focused:
+        if button.hovering:
             if len(input.text) == 0:
                 return
 
