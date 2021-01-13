@@ -1,8 +1,25 @@
 from settings import *
-# from minigames.mario import marioMinigame
-from minigames.pong.pong import *
+
+# import menu.main
+# import menu.lobby
 
 from manager.gameManager import gameManager
+
+import minigames.mario.mario
+
+def playMiniGame(minigame):
+    if minigame == "mario":
+        minigames.mario.mario.MarioMinigame()
+    if minigame == "steekspel":
+        minigames.steekspel.steekspel.startSteekspel()
+    if minigame == "pong":
+        pass
+    if minigame == "willem zn spel":
+        pass
+
+gameManager.connectToServer()
+
+playMiniGame("steekspel")
 
 # Setup function.
 def setup():
@@ -22,7 +39,6 @@ def setup():
 
 def stop():
     gameManager.client.send("exit", {})
-    gameManager.client.close()
 
 def draw():
     pass

@@ -2,12 +2,13 @@
 Screen width and height.
 Note: This will be used in the future for scaling.
 """
-screenWidth = 1280  
+screenWidth = 1280
 screenHeight = 720
+
 """
 Socket settings
 """
-socketIP = "localhost"
+socketIP = "192.168.2.10"
 socketPort = 8080
 
 """
