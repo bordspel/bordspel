@@ -45,5 +45,4 @@ class GameManager:
     def connectToServer(self):
         self.client.connect()
 
-
 gameManager = GameManager()

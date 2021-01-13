@@ -37,7 +37,6 @@ def setup():
 
 def stop():
     gameManager.client.send("exit", {})
-    gameManager.client.close()
 
 def draw():
     pass
