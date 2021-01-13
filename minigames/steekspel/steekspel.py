@@ -21,13 +21,16 @@ winnerDelay = 0
 eindDelay = 0
 buttonX = screenWidth * 0.80
 buttonY = screenHeight * 0.13
-gridBad1 = screenWidth * 0.2 #<384
-gridBad2 = screenWidth * 0.8 #>1536
-gridDecent1 = screenWidth * 0.35 #<672
-gridDecent2 = screenWidth * 0.65 #>1248
-gridGood1 = screenWidth * 0.45 #<864
-gridGood2 = screenWidth * 0.55 #>1056
-gridBest = screenWidth * 0.5 #864 ... 1056
+gridBad1 = screenWidth * 0.2 
+gridBad2 = screenWidth * 0.8
+gridDecent1 = screenWidth * 0.3
+gridDecent2 = screenWidth * 0.7
+gridGood1 = screenWidth * 0.4
+gridGood2 = screenWidth * 0.6
+gridExcellent1 = screenWidth * 0.45
+gridExcellent2 = screenWidth * 0.55
+gridBest = screenWidth * 0.5
+
 score = 0
 
 def keyIntro(event):
@@ -65,15 +68,21 @@ def drawMeter(layer, element):
     if mousePressed == True:
         if buttonX < mouseX < buttonX + 250 and buttonY < mouseY < buttonY + 180: #Nog veranderen naar de button in library
             hartjeSpeed = 0
-            if hartjeX <= gridBad1 or hartjeX >= gridBad2:
+            if hartjeX + 145 <= gridBad1 or hartjeX + 145 >= gridBad2:
                 score = 1
-            elif hartjeX > gridBad1 and hartjeX <= gridDecent1 or hartjeX < gridBad2 and hartjeX >= gridDecent2:
+            elif hartjeX + 145 > gridBad1 and hartjeX + 145 <= gridDecent1 or hartjeX + 145 < gridBad2 and hartjeX + 145 >= gridDecent2:
                 score = 2
-            elif hartjeX > gridDecent1 and hartjeX <= gridGood1 or hartjeX < gridDecent2 and hartjeX >= gridGood2:
+            elif hartjeX + 145 > gridDecent1 and hartjeX + 145 <= gridGood1 or hartjeX + 145 < gridDecent2 and hartjeX + 145 >= gridGood2:
                 score = 3
-            else:
+            elif hartjeX + 145 > gridGood1 and hartjeX + 145 <= gridExcellent1 or hartjeX + 145 < gridGood2 and hartjeX + 145 >= gridExcellent2:
                 score = 4
+<<<<<<< Updated upstream
     if score > 0:
+=======
+            else:
+                score = 5
+    if score > 0 and meterDelay != -1:
+>>>>>>> Stashed changes
         meterDelay += 1
         if meterDelay >= 130:
             # =================================
@@ -85,6 +94,7 @@ def drawMeter(layer, element):
             # DIT MOET NAAR DE FUNCTIE `networkListener()` toe!!!!
             layer.removeElement(elementMeter)
             elementMeter.unregisterDrawListener(drawMeter)
+<<<<<<< Updated upstream
             elementSpeler1.registerDrawListener(drawSpeler)
             elementSpeler2.registerDrawListener(drawSpeler)
         
@@ -95,12 +105,31 @@ def drawSpeler(layer, element):
     fill(0,0,128)
     #Tekent 2 spelers
     rect(element.x, element.y, spelerWidth, spelerHeight)
+=======
+            elementBackground.registerDrawListener(drawBackground)
+            layer.addElement(textLoading)
+        
+def drawSpeler(layer, element):
+    if element.id == 'Speler1' or elementSpeler1.hidden:
+        background(79, 195, 247)
+    global velocity1, velocity2, winnerDelay, winner, gelijkspel 
+    #Tekent 2 spelers
+    if element.id == 'Speler1':
+        imageHorseRight = loadImage('./HorseRight.png')
+        image(imageHorseRight, element.x, element.y)
+    if element.id == 'Speler2':
+        imageHorseLeft = loadImage('./HorseLeft.png')
+        image(imageHorseLeft, element.x, element.y)
+    fill(109, 76, 65)
+    rect(200, screenHeight, screenWidth, screenHeight * 0,80)
+>>>>>>> Stashed changes
     if element.id == "Speler1":
         element.x += velocity1 
     if element.id == "Speler2":
         element.x += velocity2
     #Colision check
     if elementSpeler2.x - elementSpeler1.x - spelerWidth < 10:
+<<<<<<< Updated upstream
         elementSpeler2.unregisterDrawListener(drawSpeler)
         winnerDelay += 1
         velocity1 *= 0.95
@@ -121,6 +150,25 @@ def drawEind(layer, element):
         elementEind.unregisterDrawListener(drawEind)
         layer.removeElement(textEind)
         startSteekspel()
+=======
+        if gelijkspel:
+            winnerDelay += 1
+            velocity1 *= 0.97
+            velocity2 *= 0.97
+        else:
+            if winner:
+                elementSpeler2.unregisterDrawListener(drawSpeler)
+                winnerDelay += 1
+                velocity1 *= 0.95
+            else:
+                elementSpeler1.hide()
+                winnerDelay += 1
+                velocity2 *= 0.95
+        if winnerDelay >= 620:
+            elementSpeler1.unregisterDrawListener(drawSpeler)
+            elementSpeler2.unregisterDrawListener(drawSpeler)
+            layer.removeElement(textEind)
+>>>>>>> Stashed changes
 
 def startSteekspel():
     gameManager.layerManager.setActiveLayerByName("minigame-steekspel")
@@ -148,13 +196,36 @@ def drawBackground(layer, element):
 
 # Dit bepaald wie de winnaar is.
 def networkListener(client, data):
+<<<<<<< Updated upstream
+=======
+    global gelijkspel, winner
+>>>>>>> Stashed changes
     if data["type"] == "steekspel":
         winner = gameManager.client.id == data["winner"]
         gelijkspel = data["winner"] == "NONE"
 
+<<<<<<< Updated upstream
         # HIER MOET DE CODE VAN DE WIN/LOSE ANIMATIE KOMEN
         print(winner)
         print(gelijkspel)
+=======
+        layer.addElement(textEind)
+
+        if gelijkspel:
+            textEind.setText("Het is gelijkspel!\n Jullie hebben niks gewonnen of veloren.")
+        else:
+            if winner:
+                textEind.setText("Jij bent de winnaar!\n Je krijgt 15 Dukaten en 1 Charisma van de verliezer.")
+            else:
+                textEind.setText("Jij bent de verliezer!\n Je moet 15 Dukaten en 1 Charisma aan de winnaar geven.")    
+        
+
+        elementBackground.unregisterDrawListener(drawBackground)
+        layer.removeElement(textLoading)
+
+        elementSpeler1.registerDrawListener(drawSpeler)
+        elementSpeler2.registerDrawListener(drawSpeler)
+>>>>>>> Stashed changes
 
 gameManager.client.register_listener(networkListener)
 
@@ -171,7 +242,13 @@ elementMeter = layer.createElement("Meter", 200, 200)
 
 # layer.addElement(textIntro)
 
+<<<<<<< Updated upstream
 elementEind = layer.createElement("Eind", 0, 0)
+=======
+textEind = Text("TextEind", screenWidth / 2, screenHeight / 2 - 200, "")
+textEind.setTextSize(34)
+textEind.setColor(255)
+>>>>>>> Stashed changes
 
 textIntro = Text("TextIntro", screenWidth / 2, screenHeight / 2, "Welkom bij het Steekspel!\n\nIn deze minigame ga je tegen elkaar strijden door middel van liefde.\nU krijgt zo een liefde meter te zien met een hartje die snel heen en weer beweegt.\nDe bedoeling is om dat hartje zo dicht mogelijk in het midden te krijgen van de liefde meter.\nHoe dichter het hartje in het midden is, hoe meer liefde je heb en hoe groter de kans is dat je wint.\nOm het hartje stop te zetten drukt u met uw muisknop op de rode knop rechtsboven.\n\n\n\n\nDruk op spatie om verder te gaan.")
 textIntro.setTextSize(26)
