@@ -1,10 +1,17 @@
 from settings import *
-from minigames.mario.mario import *
+# sfrom minigames.mario.mario import *
 
 import menu.main
 import menu.beforeLobby
 
 from manager.gameManager import gameManager
+
+from custom.input import *
+
+layer = gameManager.layerManager.createLayer("aaaa")
+gameManager.layerManager.setActiveLayerByName("aaaa")
+
+i = Input(layer, 100, 100, 300, 100, textColor=255)
 
 # Setup function.
 def setup():
