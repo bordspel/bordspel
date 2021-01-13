@@ -1,4 +1,5 @@
 from manager.gameManager import gameManager
+from bordspel.library.element.custom import *
 import random as rd
 
 gameManager.audioManager.loadAudio("minigames\\pong\\assets\\pop.mp3")
@@ -6,6 +7,8 @@ gameManager.audioManager.loadAudio("minigames\\pong\\assets\\block.mp3")
 gameManager.audioManager.loadAudio("minigames\\pong\\assets\\blockH.mp3")
 gameManager.audioManager.loadAudio("minigames\\pong\\assets\\blockM.mp3")
 gameManager.audioManager.loadAudio("minigames\\pong\\assets\\blockL.mp3")
+
+gameManager.imageManager.loadImage("minigames\\pong\\assets\\background720.png")
 
 aDown = False
 aUp = False
@@ -25,6 +28,10 @@ batVelocityB = 0
 
 particles = []
 
+spelOver = False
+winner = False
+gelijkspel = False
+
 def randomBlockSound():
     blockSound = rd.randint(1,3)
     if blockSound == 1:
@@ -38,8 +45,8 @@ def randomBlockSound():
         gameManager.audioManager.getAudio("minigames\\pong\\assets\\blockL.mp3").play()   
 
 def onSetup():
-    global w, h, ballX, ballY, ballSize, ballTrail, paddleWidth, paddleHeight, a, b, img, imgWhite, imgRed
-    
+    global w, h, ballX, ballY, ballSize, ballTrail, paddleWidth, paddleHeight, a, b, img, imgWhite, imgRed, started
+
     # Note: This needs to be changed to use the imageManager.
     img = loadImage("minigames\\pong\\assets\\background720.png")
     imgWhite = loadImage("minigames\\pong\\assets\\WhiteHeart.png")
@@ -59,6 +66,8 @@ def onSetup():
     paddleWidth = h/20
     paddleHeight = h/4
     a = b = (h - paddleHeight) / 2
+
+    started = False
     
     textSize(h/5)
     
@@ -66,11 +75,11 @@ def onSetup():
     
 def onDraw(layer,element):       
     global a, b, ballX, ballY, ballTrail, ballVelocityX, ballVelocityY, ballSpeed, scoreA, scoreB, particles, hp1, hp2
-    global count, batVelocityB
+    global count, batVelocityB, started
     
     background(img)
     # background(0)
-    if hp1 >0 and hp2 >0:
+    if not spelOver:
         if frameCount == 1:
             onSetup()
             
@@ -101,16 +110,6 @@ def onDraw(layer,element):
                 b -= 5
             elif b + paddleHeight / 2 < height / 2 - 10:
                 b += 5
-
-        # if ((b + paddleHeight / 2) - ballY) > 75 and ballVelocityX > 0:
-        #     b -= 5
-        # elif ((b + paddleHeight / 2) - ballY) < -75 and ballVelocityX > 0:
-        #     b += 5  
-
-        # if ((b + paddleHeight / 2) - ballY) > 0 and ballVelocityX > 0:
-        #     b -= 5*min((200 - w - paddleWidth - ballX)/2000,0)
-        # elif ((b + paddleHeight / 2) - ballY) < 1 and ballVelocityX > 0:
-        #     b += 5*min((200 - w - paddleWidth - ballX)/2000,0)
 
         # particles
         fill("#FFFFFF")
@@ -145,26 +144,26 @@ def onDraw(layer,element):
         text(scoreA, w/2 - h/5, h/5)
         text(scoreB, w/2 + h/5, h/5)
         
-        fill("#000000")
-        rect(0,0,hp1*75,75)
-        rect(width-hp2*75,0,hp2*75,75)
+        # fill("#000000")
+        # rect(0,0,hp1*75,75)
+        # rect(width-hp2*75,0,hp2*75,75)
 
-        i = hp1 - 1
-        while i >= 0: 
-            pushMatrix()
-            translate(i*75+5.5,10) 
-            scale(0.5)
-            image(imgRed,0,0)
-            popMatrix()
-            i -= 1
-        i = hp2
-        while i > 0:
-            pushMatrix()
-            translate(width-i*75+5.5,10) 
-            scale(0.5)
-            image(imgRed,0,0)
-            popMatrix()
-            i -= 1
+        # i = hp1 - 1
+        # while i >= 0: 
+        #     pushMatrix()
+        #     translate(i*75+5.5,10) 
+        #     scale(0.5)
+        #     image(imgRed,0,0)
+        #     popMatrix()
+        #     i -= 1
+        # i = hp2
+        # while i > 0:
+        #     pushMatrix()
+        #     translate(width-i*75+5.5,10) 
+        #     scale(0.5)
+        #     image(imgRed,0,0)
+        #     popMatrix()
+        #     i -= 1
         
         if aDown and a < h - paddleHeight - paddleWidth/3:
             a += speed / frameRate * h
@@ -210,22 +209,26 @@ def onDraw(layer,element):
         ballSpeed += .0000001 / frameRate * h
 
         # Counter voor 30 seconds.
-        if count <= (60 * 7) and count != -1:
+        if count <= (60 * 30) and count != -1:
             count += 1
         elif count != -1:
             count = -1
 
             gameManager.client.send("pong", {"player": gameManager.client.id, "scorePlayer": scoreA, "scoreBot": scoreB})
-
-    else: 
-        if hp1 <1:
-            winner = "Player 2 has won!"
+       
+    global gewonnen, gelijkspel, spelOver
+    if spelOver: 
+        if gewonnen:
+            winnerText = "Je hebt gewonnen!"
         else:
-            winner = "Player 1 has won!"
+            winnerText = "Je hebt verloren!"
+        if gelijkspel:
+            winnerText = "Er is gelijkspel!"
+
         textAlign(CENTER,CENTER)
         textSize(120)
         fill("#FFFFFF")
-        text('GAME OVER\n'+winner,width/2,height/2)  
+        text('GAME OVER\n'+winnerText,width/2,height/2)  
 
 def resetBall():
     global ballX, ballY, ballTrail, ballVelocityX, ballVelocityY, ballSpeed, ballSize
@@ -268,22 +271,74 @@ def onKeyEvent(event):
         handleKeys(False)
 
 def networkListener(client, data):
+    global gelijkspel, gewonnen, spelOver
     if data["type"] == "pong":
-        winner = data["winner"]
+        winnaarSpeler = data["winner"]
 
         #########################################
         # GEBRUIK DEZE VARIABLES OM OP HET SCHERM TE LATEN ZIEN OF JE GEWONNEN, VERLOREN OF GELIJKSPEL HEBT!!!
         #########################################
-        gelijkspel = winner == "NONE"
-        gewonnen = winner == client.id
+        gelijkspel = winnaarSpeler == "NONE"
+        gewonnen = winnaarSpeler == client.id
+        spelOver = True
 
         print(gewonnen, gelijkspel)
 
-gameManager.client.register_listener(networkListener)
-      
-minigamePong = gameManager.layerManager.createLayer("minigamePong")
-gameManager.layerManager.setActiveLayerByName("minigamePong")
-element = minigamePong.createElement('Pong', 0, 0) 
+def resetGame():
+    global aDown, aUp, bDown, bUp, img, hp1, hp2, speed, scoreA, scoreB, count, batVelocityB, particles, spelOver, winner, gelijkspel, gewonnen
+    aDown = False
+    aUp = False
+    bDown = False
+    bUp = False
+    img = None
+    hp1 = 5
+    hp2 = 5
+    speed = 2
 
-element.registerDrawListener(onDraw)
-element.registerKeyListener(onKeyEvent)
+    scoreA = 0
+    scoreB = 0
+
+    count = 0
+
+    batVelocityB = 0
+
+    particles = []
+
+    spelOver = False
+    gewonnen = False
+    gelijkspel = False
+
+    gameManager.layerManager.removeLayerByName("startPong")
+    gameManager.layerManager.removeLayerByName("minigamePong")
+
+def startGame():
+    gameManager.client.register_listener(networkListener)
+
+    minigamePong = gameManager.layerManager.createLayer("minigamePong")
+
+    element = minigamePong.createElement('Pong', 0, 0) 
+    element.registerKeyListener(onKeyEvent)
+    element.registerDrawListener(onDraw)
+
+    buttonStart = Button("start", 640-60, 720/2, 120, 30, (156, 39, 176), (171, 71, 188))
+    textStart = Text("text", 640, 360+10,"Start Game")
+
+    startPong = gameManager.layerManager.createLayer("startPong")   
+    gameManager.layerManager.setActiveLayerByName("startPong")
+
+    element = startPong.createElement("startPong")
+
+    def mouseStart(event):
+        if event.type == "CLICK" and event.button == "LEFT":
+            if buttonStart.focused:
+                gameManager.layerManager.setActiveLayerByName("minigamePong")       
+    def drawStart(layer,element):   
+        background(gameManager.imageManager.getImage("minigames\\pong\\assets\\background720.png"))
+
+    element.registerDrawListener(drawStart)
+    element.registerMouseListener(mouseStart)
+        
+    startPong.addElement(buttonStart)
+    startPong.addElement(textStart)
+
+startGame()
