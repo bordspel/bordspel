@@ -76,13 +76,12 @@ def drawMeter(layer, element):
             # = CODE VAN NETWORKING!          =
             # = Stuur de score naar de server =
             # =================================
-            print('ggggg')
             gameManager.client.send("steekspel", {"score": score})
             layer.removeElement(elementMeter)
-            elementLoading.registerDrawListener(drawLoadingScreen)
             elementMeter.unregisterDrawListener(drawMeter)
-            elementSpeler1.registerDrawListener(drawSpeler)
-            elementSpeler2.registerDrawListener(drawSpeler)
+
+            elementBackground.registerDrawListener(drawBackground)
+            layer.addElement(textLoading)
         
 def drawSpeler(layer, element):
     if element.id == 'Speler1' or elementSpeler1.hidden:
@@ -120,20 +119,17 @@ def drawSpeler(layer, element):
         if winnerDelay >= 180:
             elementEind.registerDrawListener(drawEind)
             elementSpeler1.unregisterDrawListener(drawSpeler)
+            layer.removeElement(textEind)
      
 def drawEind(layer, element):
     global eindDelay
     background(254, 127, 156)
     #Tekent eindtekst
-    if eindDelay == 0:
-        layer.addElement(textEind)
     if eindDelay < 180:
         eindDelay += 1
     else:
         resetSteekspel()
         elementEind.unregisterDrawListener(drawEind)
-        layer.removeElement(textEind)
-        startSteekspel()
 
 def startSteekspel():
     gameManager.layerManager.setActiveLayerByName("minigame-steekspel")
@@ -152,16 +148,15 @@ def resetSteekspel():
     eindDelay = 0
     velocity1 = 10
     velocity2 = -10 
+
     elementMeter = layer.createElement("Meter", 200, 200)
     elementSpeler1 = layer.createElement("Speler1", x_speler1, y_speler1)
     elementSpeler2 = layer.createElement("Speler2", x_speler2, y_speler2)
 
+    layer.removeElement(textIntro)
+
 def drawBackground(layer, element):
     background(254, 127, 156)
-
-def drawLoadingScreen(layer, element):
-    elementBackground.registerDrawListener(drawBackground)
-    layer.addElement(textLoading)
 
 # Dit bepaald wie de winnaar is.
 def networkListener(client, data):
@@ -170,19 +165,21 @@ def networkListener(client, data):
     if data["type"] == "steekspel":
         winner = gameManager.client.id == data["winner"]
         gelijkspel = data["winner"] == "NONE"
-        print(winner)
-        # HIER MOET DE CODE VAN DE WIN/LOSE ANIMATIE KOMEN
-        #if gelijkspel:
-        #     textEind.setText("Het is gelijkspel")
-        # else:
-        #     if winner:
-        #         textEind.setText("Jij bent de winnaar")
-        #     else:
-        #         textEind.setText("Jij bent de verliezer")    
-        print('peop')
-        elementLoading.unregisterDrawListener(drawLoadingScreen)
+
+        layer.addElement(textEind)
+
+        if gelijkspel:
+            textEind.setText("Het is gelijkspel")
+        else:
+            if winner:
+                textEind.setText("Jij bent de winnaar")
+            else:
+                textEind.setText("Jij bent de verliezer")    
+        
+
         elementBackground.unregisterDrawListener(drawBackground)
         layer.removeElement(textLoading)
+
         elementSpeler1.registerDrawListener(drawSpeler)
         elementSpeler2.registerDrawListener(drawSpeler)
 
@@ -201,6 +198,10 @@ elementLoading = layer.createElement('LoadingScreen', 0, 0)
 elementMeter = layer.createElement("Meter", 200, 200)
 
 elementEind = layer.createElement("Eind", 0, 0)
+
+textEind = Text("TextEind", screenWidth / 2, screenHeight / 2 - 200, "")
+textEind.setTextSize(26)
+textEind.setColor(255)
 
 textIntro = Text("TextIntro", screenWidth / 2, screenHeight / 2, "Welkom bij het Steekspel!\n\nIn deze minigame ga je tegen elkaar strijden door middel van liefde.\nU krijgt zo een liefde meter te zien met een hartje die snel heen en weer beweegt.\nDe bedoeling is om dat hartje zo dicht mogelijk in het midden te krijgen van de liefde meter.\nHoe dichter het hartje in het midden is, hoe meer liefde je heb en hoe groter de kans is dat je wint.\nOm het hartje stop te zetten drukt u met uw muisknop op de rode knop rechtsboven.\n\n\n\n\nDruk op spatie om verder te gaan.")
 textIntro.setTextSize(26)
