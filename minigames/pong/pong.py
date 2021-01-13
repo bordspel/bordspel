@@ -21,6 +21,8 @@ scoreB = 0
 
 count = 0
 
+batVelocityB = 0
+
 particles = []
 
 def randomBlockSound():
@@ -39,7 +41,7 @@ def onSetup():
     global w, h, ballX, ballY, ballSize, ballTrail, paddleWidth, paddleHeight, a, b, img, imgWhite, imgRed
     
     # Note: This needs to be changed to use the imageManager.
-    img = loadImage("minigames\\pong\\assets\\background.jpg")
+    img = loadImage("minigames\\pong\\assets\\background720.png")
     imgWhite = loadImage("minigames\\pong\\assets\\WhiteHeart.png")
     imgRed = loadImage("minigames\\pong\\assets\\RedHeart.png")
 
@@ -64,10 +66,10 @@ def onSetup():
     
 def onDraw(layer,element):       
     global a, b, ballX, ballY, ballTrail, ballVelocityX, ballVelocityY, ballSpeed, scoreA, scoreB, particles, hp1, hp2
-    global count
-    # FIX DE BACKGROUND SIZEEEE
-    # background(img)
-    background(0)
+    global count, batVelocityB
+    
+    background(img)
+    # background(0)
     if hp1 >0 and hp2 >0:
         if frameCount == 1:
             onSetup()
@@ -84,7 +86,32 @@ def onDraw(layer,element):
             line(prev[0], prev[1], cur[0], cur[1])
             i += 1
         noStroke()
-        
+
+        # bot B 
+        # and ballVelocityX > 0
+        # and w - paddleWidth - ballX < 200
+
+        if ((b + paddleHeight / 2) - ballY) > 75 and w - paddleWidth - ballX < 200:
+            b -= 10
+        elif ((b + paddleHeight / 2) - ballY) < -75 and w - paddleWidth - ballX < 200:
+            b += 10     
+
+        if ballVelocityX < 0:
+            if b + paddleHeight / 2 > height / 2 + 10:
+                b -= 5
+            elif b + paddleHeight / 2 < height / 2 - 10:
+                b += 5
+
+        # if ((b + paddleHeight / 2) - ballY) > 75 and ballVelocityX > 0:
+        #     b -= 5
+        # elif ((b + paddleHeight / 2) - ballY) < -75 and ballVelocityX > 0:
+        #     b += 5  
+
+        # if ((b + paddleHeight / 2) - ballY) > 0 and ballVelocityX > 0:
+        #     b -= 5*min((200 - w - paddleWidth - ballX)/2000,0)
+        # elif ((b + paddleHeight / 2) - ballY) < 1 and ballVelocityX > 0:
+        #     b += 5*min((200 - w - paddleWidth - ballX)/2000,0)
+
         # particles
         fill("#FFFFFF")
         i = 0
@@ -225,11 +252,6 @@ def handleKeys(val):
         aUp = val
     elif key == "s":
         aDown = val
-    elif key == CODED:
-        if keyCode == UP:
-            bUp = val
-        elif keyCode == DOWN:
-            bDown = val
 
 def newParticles(x, y, right, big=False):
     return [
