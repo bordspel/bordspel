@@ -1,6 +1,7 @@
 from manager.gameManager import gameManager
 from bordspel.library.element.custom import *
 import random as rd
+from time import time
 
 gameManager.audioManager.loadAudio("minigames\\pong\\assets\\pop.mp3")
 gameManager.audioManager.loadAudio("minigames\\pong\\assets\\block.mp3")
@@ -22,8 +23,6 @@ speed = 2
 scoreA = 0
 scoreB = 0
 
-count = 0
-
 batVelocityB = 0
 
 particles = []
@@ -31,6 +30,8 @@ particles = []
 spelOver = False
 winner = False
 gelijkspel = False
+
+count = 0
 
 def randomBlockSound():
     blockSound = rd.randint(1,3)
@@ -75,8 +76,7 @@ def onSetup():
     
 def onDraw(layer,element):       
     global a, b, ballX, ballY, ballTrail, ballVelocityX, ballVelocityY, ballSpeed, scoreA, scoreB, particles, hp1, hp2
-    global count, batVelocityB, started
-    
+    global count, batVelocityB, started, gewonnen, gelijkspel, spelOver
     background(img)
     # background(0)
     if not spelOver:
@@ -143,6 +143,7 @@ def onDraw(layer,element):
         
         text(scoreA, w/2 - h/5, h/5)
         text(scoreB, w/2 + h/5, h/5)
+        text(str(int(endTime-time())), w/2, h/5)
         
         # fill("#000000")
         # rect(0,0,hp1*75,75)
@@ -215,8 +216,7 @@ def onDraw(layer,element):
             count = -1
 
             gameManager.client.send("pong", {"player": gameManager.client.id, "scorePlayer": scoreA, "scoreBot": scoreB})
-       
-    global gewonnen, gelijkspel, spelOver
+
     if spelOver: 
         if gewonnen:
             winnerText = "Je hebt gewonnen!"
@@ -329,9 +329,13 @@ def startGame():
     element = startPong.createElement("startPong")
 
     def mouseStart(event):
+        global endTime, startTime
         if event.type == "CLICK" and event.button == "LEFT":
             if buttonStart.focused:
-                gameManager.layerManager.setActiveLayerByName("minigamePong")       
+                startTime = time()
+                endTime = startTime + 31
+                gameManager.layerManager.setActiveLayerByName("minigamePong") 
+     
     def drawStart(layer,element):   
         background(gameManager.imageManager.getImage("minigames\\pong\\assets\\background720.png"))
 
@@ -340,5 +344,4 @@ def startGame():
         
     startPong.addElement(buttonStart)
     startPong.addElement(textStart)
-
 startGame()
