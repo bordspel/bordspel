@@ -11,7 +11,7 @@ def playMiniGame(minigame):
     if minigame == "mario":
         minigames.mario.mario.MarioMinigame()
     if minigame == "steekspel":
-        pass
+        minigames.steekspel.steekspel.startSteekspel()
     if minigame == "pong":
         pass
     if minigame == "willem zn spel":
@@ -19,7 +19,7 @@ def playMiniGame(minigame):
 
 gameManager.connectToServer()
 
-playMiniGame("mario")
+playMiniGame("steekspel")
 
 # Setup function.
 def setup():
