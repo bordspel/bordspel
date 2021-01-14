@@ -1,11 +1,20 @@
 from settings import *
 
+from minigames.schietspel.schietspel import Archer, SchietspelMinigame
+
 import menu.main
 import menu.lobby
 
 from manager.gameManager import gameManager
 
 # playMiniGame("steekspel")
+
+from custom.input import *
+
+# layer = gameManager.layerManager.createLayer("aaaa")
+# gameManager.layerManager.setActiveLayerByName("aaaa")
+
+# i = Input(layer, 100, 100, 300, 100, textColor=255)
 
 # Setup function.
 def setup():
