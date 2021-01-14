@@ -93,6 +93,8 @@ class MarioMap:
             x2 -= self.xOffset
 
             # line(x1, y1 + 7, x2, y1 + 7)
+            strokeWeight(1)
+            stroke(0)
             line(x1, y1 + 2, x2, y1 + 2)
 
 class MapBlock:

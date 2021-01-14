@@ -1,6 +1,7 @@
 from manager.gameManager import gameManager
 from bordspel.library.element.custom import *
 import random as rd
+from time import time
 
 gameManager.audioManager.loadAudio("minigames\\pong\\assets\\pop.mp3")
 gameManager.audioManager.loadAudio("minigames\\pong\\assets\\block.mp3")
@@ -22,8 +23,6 @@ speed = 2
 scoreA = 0
 scoreB = 0
 
-count = 0
-
 batVelocityB = 0
 
 particles = []
@@ -31,6 +30,9 @@ particles = []
 spelOver = False
 winner = False
 gelijkspel = False
+
+count = 0
+gameOverCounter = 0
 
 def randomBlockSound():
     blockSound = rd.randint(1,3)
@@ -75,8 +77,7 @@ def onSetup():
     
 def onDraw(layer,element):       
     global a, b, ballX, ballY, ballTrail, ballVelocityX, ballVelocityY, ballSpeed, scoreA, scoreB, particles, hp1, hp2
-    global count, batVelocityB, started
-    
+    global count, batVelocityB, started, gewonnen, gelijkspel, spelOver, gameOverCounter
     background(img)
     # background(0)
     if not spelOver:
@@ -143,6 +144,7 @@ def onDraw(layer,element):
         
         text(scoreA, w/2 - h/5, h/5)
         text(scoreB, w/2 + h/5, h/5)
+        text(str(int(endTime-time())), w/2, h/5)
         
         # fill("#000000")
         # rect(0,0,hp1*75,75)
@@ -215,20 +217,29 @@ def onDraw(layer,element):
             count = -1
 
             gameManager.client.send("pong", {"player": gameManager.client.id, "scorePlayer": scoreA, "scoreBot": scoreB})
-       
-    global gewonnen, gelijkspel, spelOver
+
     if spelOver: 
+
+        gameOverCounter += 1
+
         if gewonnen:
-            winnerText = "Je hebt gewonnen!"
+            winnerText = "Je hebt gewonnen!\nJe krijgt 15 Dukaten en 1 Charisma."
         else:
-            winnerText = "Je hebt verloren!"
+            winnerText = "Je hebt verloren!\nJe verliest 15 Dukaten en 1 Charisma."
         if gelijkspel:
             winnerText = "Er is gelijkspel!"
 
         textAlign(CENTER,CENTER)
-        textSize(120)
+        textSize(48)
         fill("#FFFFFF")
         text('GAME OVER\n'+winnerText,width/2,height/2)  
+
+        if gameOverCounter > 360: 
+            gameManager.inGame = False
+            gameManager.inGameCounter = 0
+            resetGame()
+
+            gameManager.layerManager.setActiveLayerByName("menu-lobby")
 
 def resetBall():
     global ballX, ballY, ballTrail, ballVelocityX, ballVelocityY, ballSpeed, ballSize
@@ -282,10 +293,9 @@ def networkListener(client, data):
         gewonnen = winnaarSpeler == client.id
         spelOver = True
 
-        print(gewonnen, gelijkspel)
-
 def resetGame():
     global aDown, aUp, bDown, bUp, img, hp1, hp2, speed, scoreA, scoreB, count, batVelocityB, particles, spelOver, winner, gelijkspel, gewonnen
+    global gameOverCounter 
     aDown = False
     aUp = False
     bDown = False
@@ -308,12 +318,15 @@ def resetGame():
     gewonnen = False
     gelijkspel = False
 
+    gameOverCounter = 0
+
     gameManager.layerManager.removeLayerByName("startPong")
     gameManager.layerManager.removeLayerByName("minigamePong")
 
-def startGame():
-    gameManager.client.register_listener(networkListener)
 
+gameManager.client.register_listener(networkListener)
+
+def startGame():
     minigamePong = gameManager.layerManager.createLayer("minigamePong")
 
     element = minigamePong.createElement('Pong', 0, 0) 
@@ -329,9 +342,13 @@ def startGame():
     element = startPong.createElement("startPong")
 
     def mouseStart(event):
+        global endTime, startTime
         if event.type == "CLICK" and event.button == "LEFT":
             if buttonStart.focused:
-                gameManager.layerManager.setActiveLayerByName("minigamePong")       
+                startTime = time()
+                endTime = startTime + 31
+                gameManager.layerManager.setActiveLayerByName("minigamePong") 
+     
     def drawStart(layer,element):   
         background(gameManager.imageManager.getImage("minigames\\pong\\assets\\background720.png"))
 
@@ -341,4 +358,4 @@ def startGame():
     startPong.addElement(buttonStart)
     startPong.addElement(textStart)
 
-startGame()
+    onSetup()

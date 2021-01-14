@@ -8,7 +8,7 @@ screenHeight = 720
 """
 Socket settings
 """
-socketIP = "192.168.2.10"
+socketIP = "localhost"
 socketPort = 8080
 
 """

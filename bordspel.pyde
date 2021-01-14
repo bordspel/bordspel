@@ -1,25 +1,18 @@
 from settings import *
 
-# import menu.main
-# import menu.lobby
+import menu.main
+import menu.lobby
 
 from manager.gameManager import gameManager
 
-import minigames.mario.mario
+# menu.lobby.playMiniGame("schietspel")
 
-def playMiniGame(minigame):
-    if minigame == "mario":
-        minigames.mario.mario.MarioMinigame()
-    if minigame == "steekspel":
-        minigames.steekspel.steekspel.startSteekspel()
-    if minigame == "pong":
-        pass
-    if minigame == "willem zn spel":
-        pass
+from custom.input import *
 
-gameManager.connectToServer()
+# layer = gameManager.layerManager.createLayer("aaaa")
+# gameManager.layerManager.setActiveLayerByName("aaaa")
 
-playMiniGame("steekspel")
+# i = Input(layer, 100, 100, 300, 100, textColor=255)
 
 # Setup function.
 def setup():
@@ -30,15 +23,12 @@ def setup():
 
     # Define the GameManager.
     global gameManager
-        
-    # Select the current active Layer.
-    background(255)
-    
-    onSetup()
 
+    textFont(createFont("./assets/schietspel/Londrina.ttf", 192))
 
 def stop():
     gameManager.client.send("exit", {})
+    gameManager.client.close()
 
 def draw():
     pass
