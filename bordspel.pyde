@@ -1,13 +1,11 @@
 from settings import *
 
-from minigames.schietspel.schietspel import Archer, SchietspelMinigame
-
 import menu.main
 import menu.lobby
 
 from manager.gameManager import gameManager
 
-# playMiniGame("steekspel")
+# menu.lobby.playMiniGame("schietspel")
 
 from custom.input import *
 
@@ -25,6 +23,8 @@ def setup():
 
     # Define the GameManager.
     global gameManager
+
+    textFont(createFont("./assets/schietspel/Londrina.ttf", 192))
 
 def stop():
     gameManager.client.send("exit", {})

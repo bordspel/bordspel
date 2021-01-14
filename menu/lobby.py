@@ -9,6 +9,7 @@ usernames = []
 import minigames.mario.mario
 import minigames.steekspel.steekspel
 import minigames.pong.pong
+import minigames.schietspel.schietspel
 
 def playMiniGame(minigame):
     if minigame == "mario":
@@ -18,7 +19,7 @@ def playMiniGame(minigame):
     if minigame == "pong":
         minigames.pong.pong.startGame()
     if minigame == "schietspel":
-        pass
+        minigames.schietspel.schietspel.startGame()
 
 def draw(layer, element):
     gameManager.inGameCounter += 1
