@@ -88,9 +88,7 @@ class Input():
     def key(self, event):
         if self.focused:
             if event.type == "TYPE":
-                print(event.key)
-
-                if event.keyCode == 0:
+                if ord(event.key) == 8:
                     if len(self.text) > 0:
                         self.text = self.text[:-1]
                     self.counter = frameRate * 0.6

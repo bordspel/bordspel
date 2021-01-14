@@ -1,11 +1,13 @@
 from settings import *
-# sfrom minigames.mario.mario import *
+
 from minigames.schietspel.schietspel import Archer, SchietspelMinigame
 
 import menu.main
-import menu.beforeLobby
+import menu.lobby
 
 from manager.gameManager import gameManager
+
+# playMiniGame("steekspel")
 
 from custom.input import *
 
@@ -23,10 +25,6 @@ def setup():
 
     # Define the GameManager.
     global gameManager
-        
-    # Select the current active Layer.
-    background(255)
-
 
 def stop():
     gameManager.client.send("exit", {})

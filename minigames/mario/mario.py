@@ -9,6 +9,7 @@ from bordspel.library.element.custom import *
 class MarioMinigame:
 
     def __init__(self):
+        gameManager.layerManager.removeLayerByName("minigame-mario")
         self.layer = gameManager.layerManager.createLayer("minigame-mario")
         gameManager.layerManager.setActiveLayerByName("minigame-mario")
 
@@ -20,8 +21,6 @@ class MarioMinigame:
         self.enemies.append(MarioEnemy(self, self.layer, 650, 138, 850, 138))
         self.enemies.append(MarioEnemy(self, self.layer, 3025, 308, 3225, 308))
         self.marioTarget = MarioTarget(self, self.layer, 4000, 278, 50, 100)
-
-        # self.marioTarget = MarioTarget(self, self.layer, 400, 150, 50, 100)
 
         self.marioEnemyPlayer = MarioEnemyPlayer(self, self.layer, 200, 200)
         self.marioPlayer = MarioPlayer(self, self.layer, self.marioMap, 200, 200)
@@ -35,6 +34,9 @@ class MarioMinigame:
         self.key = ""
 
         gameManager.client.register_listener(self.networkListener)
+
+    def showEndScreen(self, winner):
+        self.endScreen = MarioEndScreen(self, self.layer, winner)
 
     def key(self, event):
         if event.type == "PRESS":
@@ -55,11 +57,9 @@ class MarioMinigame:
             if not self.finished:
                 self.finished = True
 
-                print(winner)
-
                 self.hide()
 
-                self.endScreen = MarioEndScreen(self, self.layer, winner)
+                self.showEndScreen(winner)
 
     def hide(self):
         self.marioMap.element.unregisterDrawListener(self.marioMap.draw)
@@ -123,12 +123,12 @@ class MarioEnemy:
                 pushMatrix()
                 translate(x - self.minigame.marioMap.xOffset, 0)
                 scale(-1, 1)
-                image(gameManager.imageManager.getImage("./assets/mario/enemy.png"), 0, y - 5)
+                image(gameManager.imageManager.getImage("./assets/mario/guard.png"), 0, y + 3, self.width, self.height)
                 popMatrix()
             else:
                 pushMatrix()
                 translate(x - self.minigame.marioMap.xOffset, 0)
-                image(gameManager.imageManager.getImage("./assets/mario/enemy.png"), 0, y - 5)
+                image(gameManager.imageManager.getImage("./assets/mario/guard.png"), 0, y + 3, self.width, self.height)
                 popMatrix()
                 
     def isCollidingWithPlayer(self):
@@ -164,12 +164,15 @@ class MarioTarget:
         x, y = CoordinatesUtil.toProcessingCoords(self.x, self.y)
         x -= xOffset
 
-        fill(0)
-        rect(x, y, self.width, self.height)
+        # Draw the castle
+        image(gameManager.imageManager.getImage("./assets/mario/castle.png"), x, y, self.width, self.height)
+
+        # fill(0)
+        # rect(x, y, self.width, self.height)
         
         if self.isCollidingWithPlayer():
 
-            for i in range(0, 15):
+            for i in range(0, 61):
                 gameManager.client.send("mario", {"action": "win", "player": gameManager.client.id})
 
     def isCollidingWithPlayer(self):
@@ -198,10 +201,10 @@ class MarioEndScreen:
 
         if winner:
             result = "Je hebt gewonnen!"
-            result2 = "Je krijgt ... Dukaten en ... Charisma."
+            result2 = "Je krijgt 15 Dukaten en 1 Charisma."
         else:
             result = "Je hebt verloren!"
-            result2 = "Je verliest ... Dukaten en ... Charisma."
+            result2 = "Je verliest 15 Dukaten en 1 Charisma."
 
         self.text = Text("TextEndScreen", screenWidth / 2, screenHeight / 2 - 50, result)
         self.text.setTextSize(40)
@@ -213,16 +216,17 @@ class MarioEndScreen:
         self.layer.addElement(self.text2)
 
     def tick(self, layer, element):
+        background(gameManager.imageManager.getImage("./assets/mario/background.png"))
         self.count += 1
 
         if self.count >= 360:
             self.layer.removeElement(self.text)
             self.layer.removeElement(self.text2)
 
+            gameManager.inGame = False
+            gameManager.inGameCounter = 0
+
             self.counter.unregisterDrawListener(self.tick)
 
-            gameManager.layerManager.removeLayerByName("minigame-mario")
-
-            MarioMinigame()
-
-marioMinigame = MarioMinigame()
+            # Switch the layer back to the lobby.
+            gameManager.layerManager.setActiveLayerByName("menu-lobby")

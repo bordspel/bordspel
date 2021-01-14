@@ -20,7 +20,7 @@ class MarioPlayer:
 
         self.started = False
 
-        self.hp = 2
+        self.hp = 3
         self.timer = 0
 
         self.tooltipTimer = 0
@@ -38,11 +38,11 @@ class MarioPlayer:
         # fill(77, 170, 46)
         # rect(element.x, element.y, self.width, self.height)
 
-        playerImage = "./assets/mario/player.png"
+        playerImage = "./assets/mario/horse_blue.png"
         if self.body.direction.xVelocity != 0 or self.previousXOffset != self.map.xOffset:
             self.moving = True
             if (self.timer % 30) >= 15:
-                playerImage = "./assets/mario/player-moving.png"
+                playerImage = "./assets/mario/horse_blue_moving.png"
         else:
             self.moving = False
 
@@ -50,10 +50,10 @@ class MarioPlayer:
             pushMatrix()
             translate(self.width + element.x, 0)
             scale(-1, 1)
-            image(gameManager.imageManager.getImage(playerImage), 0, element.y + 3)
+            image(gameManager.imageManager.getImage(playerImage), 0, element.y, self.width, self.height)
             popMatrix()
         else:
-            image(gameManager.imageManager.getImage(playerImage), element.x, element.y + 3)
+            image(gameManager.imageManager.getImage(playerImage), element.x, element.y, self.width, self.height)
 
         # Draw the tooltips at the start of the game.
         if self.tooltipTimer <= 300:
@@ -121,14 +121,17 @@ class MarioPlayer:
 
         # Check if the Player died.
         if self.hp <= 0:
-            pass
-            #TODO
-            #element.hide()
+            for i in range(0, 61):
+                gameManager.client.send("mario", {"action": "win", "player": ""})
+
+            self.minigame.finished = True
+            self.minigame.hide()
+            self.minigame.showEndScreen(False)
 
         # Send the position of the Player to the client.
         if frameCount % 3 == 0:
             gameManager.client.send("mario", {"action": "position", "player": gameManager.client.id, "x": self.body.x, "y": self.body.y, "xOffset": self.map.xOffset, "direction": self.facing, "moving": self.moving})
-
+    
     def reset(self, first=False):
         """
         Resets the Player and the Map.
@@ -179,19 +182,19 @@ class MarioEnemyPlayer:
         gameManager.client.register_listener(self.networkListener)
 
     def draw(self, layer, element):
-        playerImage = "./assets/mario/player.png"
+        playerImage = "./assets/mario/horse_red.png"
         if self.moving:
             if (frameCount % 30) >= 15:
-                playerImage = "./assets/mario/player-moving.png"
+                playerImage = "./assets/mario/horse_red_moving.png"
 
         if self.direction == "LEFT":
             pushMatrix()
             translate(self.width + element.x - self.minigame.marioMap.xOffset + self.xOffset, 0)
             scale(-1, 1)
-            image(gameManager.imageManager.getImage(playerImage), 0, element.y + self.height + 3)
+            image(gameManager.imageManager.getImage(playerImage), 0, element.y + self.height, self.width, self.height)
             popMatrix()
         else:
-            image(gameManager.imageManager.getImage(playerImage), element.x - self.minigame.marioMap.xOffset + self.xOffset, element.y + self.height + 3)
+            image(gameManager.imageManager.getImage(playerImage), element.x - self.minigame.marioMap.xOffset + self.xOffset, element.y + self.height, self.width, self.height)
         
     def networkListener(self, client, data):
         if data["type"] == "mario" and data["action"] == "position":
